@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Salon Lucky Wheel - Win Your Next Visit Offer!</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🌟 Thank You for Your Visit! 🌟</h1>
+            <p class="subtitle">Spin the wheel to reveal your exclusive offer for next time!</p>
+        </header>
+
+        <div class="game-section">
+            <div class="wheel-container">
+                <canvas id="wheel" width="500" height="500"></canvas>
+                <div class="spin-button-wrapper">
+                    <button id="spinButton" class="spin-button">SPIN THE WHEEL</button>
+                </div>
+                <div class="pointer"></div>
+            </div>
+
+            <div id="resultModal" class="modal">
+                <div class="modal-content">
+                    <h2>🎉 Congratulations! 🎉</h2>
+                    <div id="offerResult" class="offer-result"></div>
+                    <p class="offer-code">Your Code: <span id="offerCode"></span></p>
+                    <p class="valid-until">Valid until your next visit</p>
+                    <button id="closeModal" class="close-button">Got It!</button>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>We appreciate your business! See you soon! 💇‍♀️✨</p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
