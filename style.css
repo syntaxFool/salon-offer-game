@@ -331,18 +331,40 @@ h1 {
 
 .modal-actions {
     display: flex;
-    gap: 15px;
+    gap: 12px;
     justify-content: center;
     margin-top: 25px;
     flex-wrap: wrap;
+}
+
+.save-button {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 14px 28px;
+    font-size: 1.05em;
+    font-weight: 700;
+    border-radius: 50px;
+    cursor: pointer;
+    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+    transition: all 0.3s ease;
+}
+
+.save-button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 30px rgba(102, 126, 234, 0.4);
+}
+
+.save-button:active {
+    transform: translateY(-1px);
 }
 
 .print-button {
     background: linear-gradient(135deg, #06a77d 0%, #43e97b 100%);
     color: white;
     border: none;
-    padding: 14px 30px;
-    font-size: 1.1em;
+    padding: 14px 28px;
+    font-size: 1.05em;
     font-weight: 700;
     border-radius: 50px;
     cursor: pointer;
@@ -355,26 +377,30 @@ h1 {
     box-shadow: 0 12px 30px rgba(6, 167, 125, 0.4);
 }
 
+.print-button:active {
+    transform: translateY(-1px);
+}
+
 .close-button {
     background: linear-gradient(135deg, #d4af37 0%, #f4d03f 100%);
     color: white;
     border: none;
-    padding: 12px 40px;
-    font-size: 1em;
-    border-radius: 30px;
+    padding: 14px 35px;
+    font-size: 1.05em;
+    border-radius: 50px;
     cursor: pointer;
-    font-weight: bold;
+    font-weight: 700;
     box-shadow: 0 5px 15px rgba(212, 175, 55, 0.4);
     transition: all 0.3s ease;
 }
 
 .close-button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 7px 20px rgba(0, 0, 0, 0.4);
+    transform: translateY(-3px);
+    box-shadow: 0 7px 20px rgba(212, 175, 55, 0.5);
 }
 
 .close-button:active {
-    transform: translateY(0);
+    transform: translateY(-1px);
 }
 
 footer {

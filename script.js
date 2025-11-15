@@ -41,6 +41,10 @@ const offers = gameConfig.offers;
 let soundEnabled = true;
 let audioContext = null;
 
+// Load celebration sound
+const winSound = new Audio('Crowd Celebration 10.mp3');
+winSound.volume = 0.5; // 50% volume
+
 // Initialize audio context on first user interaction
 function initAudioContext() {
     if (!audioContext) {
@@ -77,27 +81,10 @@ function playTickSound() {
 function playWinSound() {
     if (!soundEnabled) return;
     try {
-        const ctx = initAudioContext();
-        const notes = [523.25, 587.33, 659.25, 783.99]; // C5, D5, E5, G5
-        
-        notes.forEach((freq, index) => {
-            const oscillator = ctx.createOscillator();
-            const gainNode = ctx.createGain();
-            
-            oscillator.connect(gainNode);
-            gainNode.connect(ctx.destination);
-            
-            oscillator.frequency.value = freq;
-            oscillator.type = 'sine';
-            
-            const startTime = ctx.currentTime + (index * 0.1);
-            const duration = 0.15;
-            
-            gainNode.gain.setValueAtTime(0.15, startTime);
-            gainNode.gain.exponentialRampToValueAtTime(0.01, startTime + duration);
-            
-            oscillator.start(startTime);
-            oscillator.stop(startTime + duration);
+        // Play the crowd celebration MP3
+        winSound.currentTime = 0;
+        winSound.play().catch(err => {
+            console.warn('Could not play win sound:', err);
         });
     } catch (e) {
         // Silent fail
@@ -147,8 +134,7 @@ const ctx = canvas.getContext('2d');
 const spinButton = document.getElementById('spinButton');
 const modal = document.getElementById('resultModal');
 const closeModalButton = document.getElementById('closeModal');
-const printOfferButton = document.getElementById('printOffer');
-const soundToggleButton = document.getElementById('soundToggle');
+const saveOfferButton = document.getElementById('saveOffer');
 const offerResult = document.getElementById('offerResult');
 const offerCode = document.getElementById('offerCode');
 
@@ -406,68 +392,222 @@ function closeModal() {
     modal.classList.remove('show');
 }
 
+// Generate offer HTML for print/save
+function generateOfferHTML(offerText, code) {
+    const today = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+    return `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Your Salon Offer - ${code}</title>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <style>
+                * { margin: 0; padding: 0; box-sizing: border-box; }
+                body {
+                    font-family: 'Segoe UI', Arial, sans-serif;
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    padding: 40px 20px;
+                    min-height: 100vh;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                }
+                .offer-container {
+                    background: white;
+                    padding: 50px 40px;
+                    border-radius: 20px;
+                    max-width: 600px;
+                    width: 100%;
+                    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+                    border: 3px solid #d4af37;
+                }
+                .header {
+                    text-align: center;
+                    margin-bottom: 30px;
+                    padding-bottom: 20px;
+                    border-bottom: 2px solid #f0f0f0;
+                }
+                h1 { 
+                    color: #d4af37; 
+                    font-size: 2.5em; 
+                    margin-bottom: 10px;
+                    text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+                }
+                .salon-name {
+                    color: #764ba2;
+                    font-size: 1.2em;
+                    font-weight: 600;
+                    margin-top: 10px;
+                }
+                .offer-section {
+                    text-align: center;
+                    margin: 40px 0;
+                }
+                .offer-label {
+                    color: #666;
+                    font-size: 1em;
+                    text-transform: uppercase;
+                    letter-spacing: 2px;
+                    margin-bottom: 15px;
+                    font-weight: 600;
+                }
+                .offer { 
+                    font-size: 2.2em; 
+                    font-weight: bold; 
+                    color: #667eea; 
+                    margin: 20px 0;
+                    padding: 25px;
+                    background: linear-gradient(135deg, #ffd700 0%, #f4d03f 100%);
+                    border-radius: 15px;
+                    box-shadow: 0 5px 20px rgba(212, 175, 55, 0.3);
+                    border: 3px solid #d4af37;
+                }
+                .code-section {
+                    text-align: center;
+                    margin: 30px 0;
+                    padding: 25px;
+                    background: #f9f9f9;
+                    border-radius: 10px;
+                }
+                .code-label {
+                    color: #666;
+                    font-size: 0.9em;
+                    margin-bottom: 10px;
+                    text-transform: uppercase;
+                    letter-spacing: 1px;
+                }
+                .code { 
+                    font-size: 1.8em; 
+                    font-weight: bold;
+                    color: #d4af37;
+                    font-family: 'Courier New', monospace;
+                    background: white;
+                    padding: 20px;
+                    border-radius: 10px;
+                    border: 2px dashed #d4af37;
+                    letter-spacing: 3px;
+                }
+                .details {
+                    margin: 30px 0;
+                    padding: 20px;
+                    background: #fff9e6;
+                    border-left: 4px solid #d4af37;
+                    border-radius: 5px;
+                }
+                .details-item {
+                    display: flex;
+                    justify-content: space-between;
+                    padding: 10px 0;
+                    color: #333;
+                }
+                .details-label {
+                    font-weight: 600;
+                    color: #666;
+                }
+                .footer {
+                    text-align: center;
+                    margin-top: 40px;
+                    padding-top: 20px;
+                    border-top: 2px solid #f0f0f0;
+                    color: #999;
+                    font-size: 0.95em;
+                }
+                .thank-you {
+                    color: #667eea;
+                    font-weight: 600;
+                    font-size: 1.1em;
+                    margin-top: 15px;
+                }
+                @media print {
+                    body { 
+                        background: white;
+                        padding: 20px;
+                    }
+                    .offer-container {
+                        box-shadow: none;
+                        border: 2px solid #d4af37;
+                    }
+                }
+                @media (max-width: 600px) {
+                    body { padding: 20px 10px; }
+                    .offer-container { padding: 30px 20px; }
+                    h1 { font-size: 2em; }
+                    .offer { font-size: 1.6em; }
+                    .code { font-size: 1.4em; }
+                }
+            </style>
+        </head>
+        <body>
+            <div class="offer-container">
+                <div class="header">
+                    <h1>🎉 Congratulations! 🎉</h1>
+                    <div class="salon-name">Your Salon Special Offer</div>
+                </div>
+                
+                <div class="offer-section">
+                    <div class="offer-label">Your Exclusive Offer</div>
+                    <div class="offer">${offerText}</div>
+                </div>
+                
+                <div class="code-section">
+                    <div class="code-label">Redemption Code</div>
+                    <div class="code">${code}</div>
+                </div>
+                
+                <div class="details">
+                    <div class="details-item">
+                        <span class="details-label">📅 Issued:</span>
+                        <span>${today}</span>
+                    </div>
+                    <div class="details-item">
+                        <span class="details-label">⏰ Valid Until:</span>
+                        <span>Your Next Visit</span>
+                    </div>
+                    <div class="details-item">
+                        <span class="details-label">📋 How to Redeem:</span>
+                        <span>Show this code at checkout</span>
+                    </div>
+                </div>
+                
+                <div class="footer">
+                    <p>Terms & Conditions: One offer per visit. Cannot be combined with other promotions.</p>
+                    <p class="thank-you">Thank you for choosing our salon! 💇‍♀️✨</p>
+                </div>
+            </div>
+        </body>
+        </html>
+    `;
+}
+
 // Print offer
 function printOffer() {
     const printWindow = window.open('', '_blank');
     const offerText = offerResult.textContent;
     const code = offerCode.textContent;
     
-    printWindow.document.write(`
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <title>Your Salon Offer</title>
-            <style>
-                body {
-                    font-family: Arial, sans-serif;
-                    text-align: center;
-                    padding: 50px;
-                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                    color: white;
-                }
-                .offer-container {
-                    background: white;
-                    color: #333;
-                    padding: 40px;
-                    border-radius: 20px;
-                    max-width: 500px;
-                    margin: 0 auto;
-                    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-                }
-                h1 { color: #d4af37; margin-bottom: 20px; }
-                .offer { font-size: 1.8em; font-weight: bold; color: #667eea; margin: 20px 0; }
-                .code { font-size: 1.5em; background: #f4d03f; color: #333; padding: 15px; border-radius: 10px; margin: 20px 0; }
-                .validity { color: #666; margin-top: 20px; }
-                @media print {
-                    body { background: white; }
-                }
-            </style>
-        </head>
-        <body>
-            <div class="offer-container">
-                <h1>🎉 Congratulations! 🎉</h1>
-                <div class="offer">${offerText}</div>
-                <div class="code">Code: ${code}</div>
-                <p class="validity">Valid until your next visit</p>
-                <p style="margin-top: 30px; color: #999; font-size: 0.9em;">Thank you for choosing our salon!</p>
-            </div>
-        </body>
-        </html>
-    `);
-    
+    printWindow.document.write(generateOfferHTML(offerText, code));
     printWindow.document.close();
+    
     setTimeout(() => {
         printWindow.print();
     }, 250);
 }
 
-// Toggle sound
-function toggleSound() {
-    soundEnabled = !soundEnabled;
-    if (soundToggleButton) {
-        soundToggleButton.textContent = soundEnabled ? '🔊 ON' : '🔇 OFF';
-        soundToggleButton.classList.toggle('muted', !soundEnabled);
-    }
+// Save offer as PDF
+function saveOffer() {
+    const offerText = offerResult.textContent;
+    const code = offerCode.textContent;
+    
+    // Open in new window with instructions
+    const saveWindow = window.open('', '_blank');
+    saveWindow.document.write(generateOfferHTML(offerText, code));
+    saveWindow.document.close();
+    
+    // Show save dialog after short delay
+    setTimeout(() => {
+        saveWindow.print(); // User can choose "Save as PDF" in print dialog
+    }, 500);
 }
 
 // Event listeners
@@ -476,8 +616,7 @@ spinButton.addEventListener('click', () => {
     spinWheel();
 });
 closeModalButton.addEventListener('click', closeModal);
-if (printOfferButton) printOfferButton.addEventListener('click', printOffer);
-if (soundToggleButton) soundToggleButton.addEventListener('click', toggleSound);
+if (saveOfferButton) saveOfferButton.addEventListener('click', saveOffer);
 modal.addEventListener('click', (e) => {
     if (e.target === modal) {
         closeModal();
