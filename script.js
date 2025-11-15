@@ -233,19 +233,18 @@ function spinWheel() {
     
     console.log('Selected offer index:', targetOfferIndex, 'Offer:', offers[targetOfferIndex].text, offers[targetOfferIndex].subtext);
     
-    // The pointer is at the top (12 o'clock position)
-    // Segments are drawn starting from 0 at the 3 o'clock position (0 radians)
-    // We need to rotate so the target segment's CENTER is at the top (-PI/2)
+    // The pointer is at the top (12 o'clock position = -PI/2)
+    // When currentRotation = 0, segment 0 starts at angle 0 (3 o'clock)
+    // We need to rotate so that the target segment is under the pointer
     
-    // Calculate the target segment's starting angle when rotation is 0
+    // The pointer in fixed coordinates is at -PI/2
+    // For the target segment to be under the pointer, we need:
+    // targetSegmentStart + currentRotation = -PI/2 - segmentAngle/2 (to center it)
+    // So: currentRotation = -PI/2 - segmentAngle/2 - targetSegmentStart
+    
     const targetSegmentStart = targetOfferIndex * segmentAngle;
-    const targetSegmentCenter = targetSegmentStart + segmentAngle / 2;
-    
-    // The pointer is at -PI/2, so we need to rotate to align the segment center with it
-    // Rotation moves counter-clockwise, so we need: targetSegmentCenter + rotation = -PI/2
-    // Therefore: rotation = -PI/2 - targetSegmentCenter
     const randomOffsetWithinSegment = (Math.random() - 0.5) * segmentAngle * 0.6;
-    const targetRotation = -Math.PI / 2 - targetSegmentCenter + randomOffsetWithinSegment;
+    const targetRotation = -Math.PI / 2 - segmentAngle / 2 - targetSegmentStart + randomOffsetWithinSegment;
 
     // Random number of full rotations (3-6 spins)
     const minSpins = 3;
@@ -306,6 +305,23 @@ function spinWheel() {
             
             // Normalize rotation
             currentRotation = currentRotation % (2 * Math.PI);
+            
+            // Calculate which segment is under the pointer after rotation
+            // Pointer is at top (270 degrees or -PI/2 or 3*PI/2)
+            const pointerAngle = -Math.PI / 2;
+            
+            // Each segment starts at: index * segmentAngle + currentRotation
+            // The pointer points to angle -PI/2 in the canvas coordinate system
+            // We need to find which segment contains this angle
+            
+            // Normalize the pointer angle relative to the current rotation
+            const relativePointerAngle = ((pointerAngle - currentRotation) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI);
+            
+            // Find which segment this angle falls into
+            const landedSegmentIndex = Math.floor(relativePointerAngle / segmentAngle);
+            
+            console.log('Landed on segment:', landedSegmentIndex, 'Expected:', targetOfferIndex);
+            console.log('Landed offer:', offers[landedSegmentIndex].text, offers[landedSegmentIndex].subtext);
             
             // Use the pre-determined winning offer
             const winningOffer = offers[targetOfferIndex];
