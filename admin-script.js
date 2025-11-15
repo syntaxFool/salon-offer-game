@@ -1,18 +1,18 @@
 // Default configuration
 const defaultConfig = {
     offers: [
-        { text: "10% OFF", description: "10% off your next service", color: "#264653", textColor: "#ffffff", weight: 10, subtext: "", subtext2: "" },
-        { text: "15% OFF", description: "15% off your next service", color: "#2a9d8f", textColor: "#ffffff", weight: 8, subtext: "", subtext2: "" },
-        { text: "20% OFF", description: "20% off your next service", color: "#e76f51", textColor: "#000000", weight: 7, subtext: "", subtext2: "" },
-        { text: "25% OFF", description: "25% off your next service", color: "#f4a261", textColor: "#000000", weight: 6, subtext: "", subtext2: "" },
-        { text: "30% OFF", description: "30% off your next service", color: "#e63946", textColor: "#ffffff", weight: 5, subtext: "", subtext2: "" },
-        { text: "FREE", description: "Free manicure service", color: "#8338ec", textColor: "#ffffff", weight: 4, subtext: "Manicure", subtext2: "" },
-        { text: "FREE", description: "Free blowout service", color: "#fb5607", textColor: "#000000", weight: 50, subtext: "Blowout", subtext2: "" },
-        { text: "5% OFF", description: "5% off your next service", color: "#3a86ff", textColor: "#ffffff", weight: 3, subtext: "", subtext2: "" },
-        { text: "50% OFF", description: "50% off your next haircut", color: "#ffbe0b", textColor: "#000000", weight: 2, subtext: "Haircut", subtext2: "" },
-        { text: "FREE", description: "Free deep conditioning treatment", color: "#06a77d", textColor: "#ffffff", weight: 1, subtext: "Deep", subtext2: "Condition" },
+        { text: "10% OFF", description: "10% off your next service", color: "#264653", textColor: "#ffffff", weight: 35, subtext: "", subtext2: "" },
+        { text: "15% OFF", description: "15% off your next service", color: "#2a9d8f", textColor: "#ffffff", weight: 10, subtext: "", subtext2: "" },
+        { text: "20% OFF", description: "20% off your next service", color: "#e76f51", textColor: "#000000", weight: 8, subtext: "", subtext2: "" },
+        { text: "25% OFF", description: "25% off your next service", color: "#f4a261", textColor: "#000000", weight: 5, subtext: "", subtext2: "" },
+        { text: "30% OFF", description: "30% off your next service", color: "#e63946", textColor: "#ffffff", weight: 2, subtext: "", subtext2: "" },
         { text: "35% OFF", description: "35% off your next service", color: "#c1121f", textColor: "#ffffff", weight: 2, subtext: "", subtext2: "" },
-        { text: "FREE", description: "Free scalp massage (15 min)", color: "#ff006e", textColor: "#ffffff", weight: 2, subtext: "Scalp", subtext2: "Massage" }
+        { text: "40% OFF", description: "40% off your next service", color: "#8338ec", textColor: "#ffffff", weight: 2, subtext: "", subtext2: "" },
+        { text: "FREE", description: "Free manicure service", color: "#fb5607", textColor: "#000000", weight: 8, subtext: "Manicure", subtext2: "" },
+        { text: "FREE", description: "Free blowout service", color: "#3a86ff", textColor: "#ffffff", weight: 12, subtext: "Blowout", subtext2: "" },
+        { text: "FREE", description: "Free deep conditioning treatment", color: "#06a77d", textColor: "#ffffff", weight: 5, subtext: "Deep", subtext2: "Condition" },
+        { text: "FREE", description: "Free scalp massage (15 min)", color: "#ff006e", textColor: "#ffffff", weight: 10, subtext: "Scalp", subtext2: "Massage" },
+        { text: "50% OFF", description: "50% off your next haircut", color: "#ffbe0b", textColor: "#000000", weight: 1, subtext: "Haircut", subtext2: "" }
     ],
     appearance: {
         headerText: "🌟 Thank You for Your Visit! 🌟",
