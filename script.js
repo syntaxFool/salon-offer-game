@@ -235,16 +235,21 @@ function spinWheel() {
     
     // The pointer is at the top (12 o'clock position = -PI/2)
     // When currentRotation = 0, segment 0 starts at angle 0 (3 o'clock)
-    // We need to rotate so that the target segment is under the pointer
+    // We need to rotate so that the target segment CENTER is under the pointer
     
-    // The pointer in fixed coordinates is at -PI/2
-    // For the target segment to be under the pointer, we need:
-    // targetSegmentStart + currentRotation = -PI/2 - segmentAngle/2 (to center it)
-    // So: currentRotation = -PI/2 - segmentAngle/2 - targetSegmentStart
+    // Target segment occupies angles from: targetOfferIndex * segmentAngle to (targetOfferIndex + 1) * segmentAngle
+    // Center of target segment is at: targetOfferIndex * segmentAngle + segmentAngle/2
     
-    const targetSegmentStart = targetOfferIndex * segmentAngle;
+    // After applying currentRotation, this center will be at:
+    // (targetOfferIndex * segmentAngle + segmentAngle/2) + currentRotation
+    
+    // We want this to equal the pointer angle (-PI/2):
+    // (targetOfferIndex * segmentAngle + segmentAngle/2) + currentRotation = -PI/2
+    // currentRotation = -PI/2 - (targetOfferIndex * segmentAngle + segmentAngle/2)
+    
+    const targetSegmentCenter = targetOfferIndex * segmentAngle + segmentAngle / 2;
     const randomOffsetWithinSegment = (Math.random() - 0.5) * segmentAngle * 0.6;
-    const targetRotation = -Math.PI / 2 - segmentAngle / 2 - targetSegmentStart + randomOffsetWithinSegment;
+    const targetRotation = -Math.PI / 2 - targetSegmentCenter + randomOffsetWithinSegment;
 
     // Random number of full rotations (3-6 spins)
     const minSpins = 3;
