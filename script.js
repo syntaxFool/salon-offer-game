@@ -120,12 +120,10 @@ function createSparkles(x, y) {
 // Sound trigger points (placeholder - can be hooked up to actual sound files)
 function playTickSound() {
     // Add your sound file here: new Audio('tick.mp3').play();
-    console.log('🔊 Tick!');
 }
 
 function playWinSound() {
     // Add your sound file here: new Audio('win.mp3').play();
-    console.log('🔊 Winner!');
 }
 
 // Draw the wheel
