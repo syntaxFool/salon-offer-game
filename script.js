@@ -231,6 +231,8 @@ function spinWheel() {
     const targetOfferIndex = selectWeightedOffer();
     const segmentAngle = (2 * Math.PI) / offers.length;
     
+    console.log('Selected offer index:', targetOfferIndex, 'Offer:', offers[targetOfferIndex].text, offers[targetOfferIndex].subtext);
+    
     // Calculate the angle where this offer should land under the pointer
     // Pointer is at top (-PI/2), so we need to position the target segment there
     const targetSegmentMiddle = targetOfferIndex * segmentAngle + segmentAngle / 2;
