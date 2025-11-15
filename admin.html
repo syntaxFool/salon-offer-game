@@ -36,7 +36,24 @@
                 <div class="offers-controls">
                     <button id="addOfferBtn" class="btn btn-add">+ Add New Offer</button>
                 </div>
-                <div id="offersContainer" class="offers-grid"></div>
+                <div class="table-container">
+                    <table id="offersTable" class="offers-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 50px;">#</th>
+                                <th style="width: 180px;">Display Text</th>
+                                <th style="width: 280px;">Description</th>
+                                <th style="width: 80px;">Win %</th>
+                                <th style="width: 140px;">Subtext 1</th>
+                                <th style="width: 140px;">Subtext 2</th>
+                                <th style="width: 110px;">BG Color</th>
+                                <th style="width: 120px;">Text Color</th>
+                                <th style="width: 120px;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="offersTableBody"></tbody>
+                    </table>
+                </div>
             </div>
 
             <!-- Appearance Settings -->

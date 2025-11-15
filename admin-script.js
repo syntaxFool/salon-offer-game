@@ -3,16 +3,16 @@ const defaultConfig = {
     offers: [
         { text: "10% OFF", description: "10% off your next service", color: "#264653", textColor: "#ffffff", weight: 10, subtext: "", subtext2: "" },
         { text: "15% OFF", description: "15% off your next service", color: "#2a9d8f", textColor: "#ffffff", weight: 8, subtext: "", subtext2: "" },
-        { text: "20% OFF", description: "20% off your next service", color: "#e76f51", textColor: "#000000", weight: 6, subtext: "", subtext2: "" },
-        { text: "25% OFF", description: "25% off your next service", color: "#f4a261", textColor: "#000000", weight: 4, subtext: "", subtext2: "" },
-        { text: "30% OFF", description: "30% off your next service", color: "#e63946", textColor: "#ffffff", weight: 2, subtext: "", subtext2: "" },
-        { text: "FREE", description: "Free manicure service", color: "#8338ec", textColor: "#ffffff", weight: 3, subtext: "Manicure", subtext2: "" },
-        { text: "FREE", description: "Free blowout service", color: "#fb5607", textColor: "#000000", weight: 3, subtext: "Blowout", subtext2: "" },
-        { text: "5% OFF", description: "5% off your next service", color: "#3a86ff", textColor: "#ffffff", weight: 80, subtext: "", subtext2: "" },
-        { text: "50% OFF", description: "50% off your next haircut", color: "#ffbe0b", textColor: "#000000", weight: 1, subtext: "Haircut", subtext2: "" },
-        { text: "FREE", description: "Free deep conditioning treatment", color: "#06a77d", textColor: "#ffffff", weight: 3, subtext: "Deep", subtext2: "Condition" },
+        { text: "20% OFF", description: "20% off your next service", color: "#e76f51", textColor: "#000000", weight: 7, subtext: "", subtext2: "" },
+        { text: "25% OFF", description: "25% off your next service", color: "#f4a261", textColor: "#000000", weight: 6, subtext: "", subtext2: "" },
+        { text: "30% OFF", description: "30% off your next service", color: "#e63946", textColor: "#ffffff", weight: 5, subtext: "", subtext2: "" },
+        { text: "FREE", description: "Free manicure service", color: "#8338ec", textColor: "#ffffff", weight: 4, subtext: "Manicure", subtext2: "" },
+        { text: "FREE", description: "Free blowout service", color: "#fb5607", textColor: "#000000", weight: 50, subtext: "Blowout", subtext2: "" },
+        { text: "5% OFF", description: "5% off your next service", color: "#3a86ff", textColor: "#ffffff", weight: 3, subtext: "", subtext2: "" },
+        { text: "50% OFF", description: "50% off your next haircut", color: "#ffbe0b", textColor: "#000000", weight: 2, subtext: "Haircut", subtext2: "" },
+        { text: "FREE", description: "Free deep conditioning treatment", color: "#06a77d", textColor: "#ffffff", weight: 1, subtext: "Deep", subtext2: "Condition" },
         { text: "35% OFF", description: "35% off your next service", color: "#c1121f", textColor: "#ffffff", weight: 2, subtext: "", subtext2: "" },
-        { text: "FREE", description: "Free scalp massage (15 min)", color: "#ff006e", textColor: "#ffffff", weight: 3, subtext: "Scalp", subtext2: "Massage" }
+        { text: "FREE", description: "Free scalp massage (15 min)", color: "#ff006e", textColor: "#ffffff", weight: 2, subtext: "Scalp", subtext2: "Massage" }
     ],
     appearance: {
         headerText: "🌟 Thank You for Your Visit! 🌟",
@@ -42,75 +42,105 @@ function calculateTotalWeight() {
     return config.offers.reduce((sum, offer) => sum + offer.weight, 0);
 }
 
+// Auto-fix weights to total 100%
+function autoFixWeights() {
+    const total = calculateTotalWeight();
+    if (total === 0) return;
+    
+    // Proportionally adjust weights to total 100
+    const scaleFactor = 100 / total;
+    let adjustedTotal = 0;
+    
+    config.offers.forEach((offer, index) => {
+        if (index < config.offers.length - 1) {
+            offer.weight = Math.round(offer.weight * scaleFactor);
+            adjustedTotal += offer.weight;
+        }
+    });
+    
+    // Adjust last offer to ensure exactly 100
+    config.offers[config.offers.length - 1].weight = 100 - adjustedTotal;
+    
+    renderOffers();
+    renderStats();
+    showStatus('✅ Weights adjusted to total 100%', 'success');
+}
+
 // Render statistics
 function renderStats() {
     const totalWeight = calculateTotalWeight();
     const statsContainer = document.getElementById('statsContainer');
     
+    // Add warning if total doesn't equal 100
+    let warningHTML = '';
+    if (totalWeight !== 100) {
+        warningHTML = `
+            <div style="background: #fff3cd; border-left: 5px solid #ffc107; padding: 15px; margin-bottom: 20px; border-radius: 8px;">
+                <strong>⚠️ Warning:</strong> Total weight is ${totalWeight}%. It should equal 100%.
+                <button id="autoFixBtn" style="margin-left: 15px; padding: 8px 15px; background: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer;">Auto-Fix to 100%</button>
+            </div>
+        `;
+    }
+    
     const statsHTML = config.offers.map(offer => {
-        const percentage = ((offer.weight / totalWeight) * 100).toFixed(2);
         return `
             <div class="stat-card">
                 <div class="label">${offer.text}${offer.subtext ? ' ' + offer.subtext : ''}</div>
-                <div class="percentage">${percentage}%</div>
-                <div class="value">Weight: ${offer.weight}</div>
+                <div class="percentage">${offer.weight}%</div>
+                <div class="value">Win Chance</div>
             </div>
         `;
     }).join('');
     
-    statsContainer.innerHTML = statsHTML;
+    statsContainer.innerHTML = warningHTML + statsHTML;
+    
+    // Add auto-fix button listener
+    const autoFixBtn = document.getElementById('autoFixBtn');
+    if (autoFixBtn) {
+        autoFixBtn.addEventListener('click', autoFixWeights);
+    }
 }
 
-// Render offer card
-function renderOfferCard(offer, index) {
+// Render offer row for table
+function renderOfferRow(offer, index) {
     return `
-        <div class="offer-card" data-index="${index}">
-            <div class="offer-header">
-                <span class="offer-number">Offer #${index + 1}</span>
-                <button class="btn btn-danger delete-offer" data-index="${index}">🗑️ Delete</button>
-            </div>
-            <div class="offer-grid">
-                <div class="form-group">
-                    <label>Display Text</label>
-                    <input type="text" class="offer-text" value="${offer.text}" data-index="${index}">
-                </div>
-                <div class="form-group">
-                    <label>Description</label>
-                    <input type="text" class="offer-description" value="${offer.description}" data-index="${index}">
-                </div>
-                <div class="form-group">
-                    <label>Weight (Probability)</label>
-                    <input type="number" class="offer-weight" value="${offer.weight}" min="1" max="100" data-index="${index}">
-                </div>
-                <div class="form-group">
-                    <label>Background Color</label>
-                    <input type="color" class="offer-color" value="${offer.color}" data-index="${index}">
-                    <div class="color-preview" style="background-color: ${offer.color}; color: ${offer.textColor};">Preview</div>
-                </div>
-                <div class="form-group">
-                    <label>Text Color</label>
-                    <select class="offer-textcolor" data-index="${index}">
-                        <option value="#ffffff" ${offer.textColor === '#ffffff' ? 'selected' : ''}>White</option>
-                        <option value="#000000" ${offer.textColor === '#000000' ? 'selected' : ''}>Black</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Subtext Line 1 (optional)</label>
-                    <input type="text" class="offer-subtext" value="${offer.subtext || ''}" data-index="${index}">
-                </div>
-                <div class="form-group">
-                    <label>Subtext Line 2 (optional)</label>
-                    <input type="text" class="offer-subtext2" value="${offer.subtext2 || ''}" data-index="${index}">
-                </div>
-            </div>
-        </div>
+        <tr data-index="${index}">
+            <td>${index + 1}</td>
+            <td>
+                <input type="text" class="offer-text" value="${offer.text}" data-index="${index}">
+            </td>
+            <td>
+                <input type="text" class="offer-description" value="${offer.description}" data-index="${index}">
+            </td>
+            <td>
+                <input type="number" class="offer-weight" value="${offer.weight}" min="0" max="100" data-index="${index}">
+            </td>
+            <td>
+                <input type="text" class="offer-subtext" value="${offer.subtext || ''}" data-index="${index}" placeholder="Optional">
+            </td>
+            <td>
+                <input type="text" class="offer-subtext2" value="${offer.subtext2 || ''}" data-index="${index}" placeholder="Optional">
+            </td>
+            <td>
+                <input type="color" class="offer-color" value="${offer.color}" data-index="${index}">
+            </td>
+            <td>
+                <select class="offer-textcolor" data-index="${index}">
+                    <option value="#ffffff" ${offer.textColor === '#ffffff' ? 'selected' : ''}>White</option>
+                    <option value="#000000" ${offer.textColor === '#000000' ? 'selected' : ''}>Black</option>
+                </select>
+            </td>
+            <td>
+                <button class="btn-delete delete-offer" data-index="${index}">🗑️ Delete</button>
+            </td>
+        </tr>
     `;
 }
 
-// Render all offers
+// Render all offers in table
 function renderOffers() {
-    const container = document.getElementById('offersContainer');
-    container.innerHTML = config.offers.map((offer, index) => renderOfferCard(offer, index)).join('');
+    const tableBody = document.getElementById('offersTableBody');
+    tableBody.innerHTML = config.offers.map((offer, index) => renderOfferRow(offer, index)).join('');
     attachOfferEventListeners();
 }
 
@@ -156,9 +186,6 @@ function attachOfferEventListeners() {
         input.addEventListener('input', (e) => {
             const index = parseInt(e.target.dataset.index);
             config.offers[index].color = e.target.value;
-            const card = e.target.closest('.offer-card');
-            const preview = card.querySelector('.color-preview');
-            preview.style.backgroundColor = e.target.value;
         });
     });
     
@@ -167,9 +194,6 @@ function attachOfferEventListeners() {
         select.addEventListener('change', (e) => {
             const index = parseInt(e.target.dataset.index);
             config.offers[index].textColor = e.target.value;
-            const card = e.target.closest('.offer-card');
-            const preview = card.querySelector('.color-preview');
-            preview.style.color = e.target.value;
         });
     });
     
@@ -278,19 +302,24 @@ document.getElementById('importFile').addEventListener('change', (e) => {
 
 // Add new offer
 document.getElementById('addOfferBtn').addEventListener('click', () => {
+    if (config.offers.length >= 12) {
+        showStatus('⚠️ Maximum 12 offers allowed', 'error');
+        return;
+    }
+    
     const newOffer = {
         text: "NEW OFFER",
         description: "New offer description",
         color: "#333333",
         textColor: "#ffffff",
-        weight: 5,
+        weight: 0,
         subtext: "",
         subtext2: ""
     };
     config.offers.push(newOffer);
     renderOffers();
     renderStats();
-    showStatus('➕ New offer added', 'info');
+    showStatus('➕ New offer added. Adjust weights to total 100%', 'info');
 });
 
 // Appearance settings listeners
