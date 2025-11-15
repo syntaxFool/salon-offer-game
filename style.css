@@ -1,3 +1,44 @@
+/* Loading Spinner */
+.loading-spinner {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.loading-spinner.hidden {
+    opacity: 0;
+    visibility: hidden;
+}
+
+.spinner {
+    width: 60px;
+    height: 60px;
+    border: 6px solid rgba(255, 255, 255, 0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.loading-spinner p {
+    color: white;
+    font-size: 1.2em;
+    margin-top: 20px;
+    font-weight: 600;
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -284,8 +325,34 @@ h1 {
 
 .valid-until {
     color: #666;
-    font-size: 0.85em;
-    margin-bottom: 20px;
+    font-size: 0.9em;
+    margin-top: 10px;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 25px;
+    flex-wrap: wrap;
+}
+
+.print-button {
+    background: linear-gradient(135deg, #06a77d 0%, #43e97b 100%);
+    color: white;
+    border: none;
+    padding: 14px 30px;
+    font-size: 1.1em;
+    font-weight: 700;
+    border-radius: 50px;
+    cursor: pointer;
+    box-shadow: 0 8px 20px rgba(6, 167, 125, 0.3);
+    transition: all 0.3s ease;
+}
+
+.print-button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 30px rgba(6, 167, 125, 0.4);
 }
 
 .close-button {

@@ -1,3 +1,28 @@
+// Password protection
+const ADMIN_PASSWORD = 'salon2025'; // Change this to your desired password
+
+function checkPassword() {
+    const savedAuth = sessionStorage.getItem('adminAuth');
+    if (savedAuth === ADMIN_PASSWORD) {
+        return true;
+    }
+    
+    const password = prompt('Enter admin password to access this page:');
+    if (password === ADMIN_PASSWORD) {
+        sessionStorage.setItem('adminAuth', password);
+        return true;
+    } else if (password !== null) {
+        alert('Incorrect password. Access denied.');
+    }
+    window.location.href = 'index.html';
+    return false;
+}
+
+// Check password on page load
+if (!checkPassword()) {
+    throw new Error('Access denied');
+}
+
 // Default configuration
 const defaultConfig = {
     offers: [
@@ -25,13 +50,22 @@ const defaultConfig = {
 
 // Load configuration from localStorage or use default
 function loadConfig() {
-    const saved = localStorage.getItem('salonWheelConfig');
-    return saved ? JSON.parse(saved) : JSON.parse(JSON.stringify(defaultConfig));
+    try {
+        const saved = localStorage.getItem('salonWheelConfig');
+        return saved ? JSON.parse(saved) : JSON.parse(JSON.stringify(defaultConfig));
+    } catch (error) {
+        console.error('Error loading config:', error);
+        return JSON.parse(JSON.stringify(defaultConfig));
+    }
 }
 
 // Save configuration to localStorage
 function saveConfig(config) {
-    localStorage.setItem('salonWheelConfig', JSON.stringify(config));
+    try {
+        localStorage.setItem('salonWheelConfig', JSON.stringify(config));
+    } catch (error) {
+        showStatus('❌ Error saving: ' + error.message, 'error');
+    }
 }
 
 // Current configuration

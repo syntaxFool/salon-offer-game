@@ -1,8 +1,12 @@
 // Load configuration from localStorage or use defaults
 function loadGameConfig() {
-    const saved = localStorage.getItem('salonWheelConfig');
-    if (saved) {
-        return JSON.parse(saved);
+    try {
+        const saved = localStorage.getItem('salonWheelConfig');
+        if (saved) {
+            return JSON.parse(saved);
+        }
+    } catch (error) {
+        console.warn('LocalStorage unavailable or error:', error);
     }
     // Default configuration
     return {
@@ -33,6 +37,32 @@ function loadGameConfig() {
 const gameConfig = loadGameConfig();
 const offers = gameConfig.offers;
 
+// Sound state
+let soundEnabled = true;
+
+// Load sound files (create simple beep sounds if files don't exist)
+const tickSound = new Audio();
+const winSound = new Audio();
+
+// Create simple beep sounds using Web Audio API as fallback
+function createBeepSound(frequency, duration) {
+    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    const oscillator = audioContext.createOscillator();
+    const gainNode = audioContext.createGain();
+    
+    oscillator.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+    
+    oscillator.frequency.value = frequency;
+    oscillator.type = 'sine';
+    
+    gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
+    
+    oscillator.start(audioContext.currentTime);
+    oscillator.stop(audioContext.currentTime + duration);
+}
+
 // Apply appearance settings
 document.addEventListener('DOMContentLoaded', () => {
     if (gameConfig.appearance) {
@@ -44,6 +74,14 @@ document.addEventListener('DOMContentLoaded', () => {
         if (subtitle) subtitle.textContent = gameConfig.appearance.subtitleText;
         if (footer) footer.textContent = gameConfig.appearance.footerText;
     }
+    
+    // Hide loading spinner
+    setTimeout(() => {
+        const spinner = document.getElementById('loadingSpinner');
+        if (spinner) {
+            spinner.classList.add('hidden');
+        }
+    }, 500);
 });
 
 // Calculate total weight for probability
@@ -68,6 +106,8 @@ const ctx = canvas.getContext('2d');
 const spinButton = document.getElementById('spinButton');
 const modal = document.getElementById('resultModal');
 const closeModalButton = document.getElementById('closeModal');
+const printOfferButton = document.getElementById('printOffer');
+const soundToggleButton = document.getElementById('soundToggle');
 const offerResult = document.getElementById('offerResult');
 const offerCode = document.getElementById('offerCode');
 
@@ -119,11 +159,33 @@ function createSparkles(x, y) {
 
 // Sound trigger points (placeholder - can be hooked up to actual sound files)
 function playTickSound() {
-    // Add your sound file here: new Audio('tick.mp3').play();
+    if (!soundEnabled) return;
+    try {
+        // Try to play audio file first, fallback to beep
+        if (tickSound.src) {
+            tickSound.currentTime = 0;
+            tickSound.play().catch(() => createBeepSound(800, 0.05));
+        } else {
+            createBeepSound(800, 0.05);
+        }
+    } catch (e) {
+        // Silent fail if audio not supported
+    }
 }
 
 function playWinSound() {
-    // Add your sound file here: new Audio('win.mp3').play();
+    if (!soundEnabled) return;
+    try {
+        // Try to play audio file first, fallback to beep
+        if (winSound.src) {
+            winSound.currentTime = 0;
+            winSound.play().catch(() => createBeepSound(1200, 0.3));
+        } else {
+            createBeepSound(1200, 0.3);
+        }
+    } catch (e) {
+        // Silent fail if audio not supported
+    }
 }
 
 // Draw the wheel
@@ -334,9 +396,75 @@ function closeModal() {
     modal.classList.remove('show');
 }
 
+// Print offer
+function printOffer() {
+    const printWindow = window.open('', '_blank');
+    const offerText = offerResult.textContent;
+    const code = offerCode.textContent;
+    
+    printWindow.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Your Salon Offer</title>
+            <style>
+                body {
+                    font-family: Arial, sans-serif;
+                    text-align: center;
+                    padding: 50px;
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    color: white;
+                }
+                .offer-container {
+                    background: white;
+                    color: #333;
+                    padding: 40px;
+                    border-radius: 20px;
+                    max-width: 500px;
+                    margin: 0 auto;
+                    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+                }
+                h1 { color: #d4af37; margin-bottom: 20px; }
+                .offer { font-size: 1.8em; font-weight: bold; color: #667eea; margin: 20px 0; }
+                .code { font-size: 1.5em; background: #f4d03f; color: #333; padding: 15px; border-radius: 10px; margin: 20px 0; }
+                .validity { color: #666; margin-top: 20px; }
+                @media print {
+                    body { background: white; }
+                }
+            </style>
+        </head>
+        <body>
+            <div class="offer-container">
+                <h1>🎉 Congratulations! 🎉</h1>
+                <div class="offer">${offerText}</div>
+                <div class="code">Code: ${code}</div>
+                <p class="validity">Valid until your next visit</p>
+                <p style="margin-top: 30px; color: #999; font-size: 0.9em;">Thank you for choosing our salon!</p>
+            </div>
+        </body>
+        </html>
+    `);
+    
+    printWindow.document.close();
+    setTimeout(() => {
+        printWindow.print();
+    }, 250);
+}
+
+// Toggle sound
+function toggleSound() {
+    soundEnabled = !soundEnabled;
+    if (soundToggleButton) {
+        soundToggleButton.textContent = soundEnabled ? '🔊 ON' : '🔇 OFF';
+        soundToggleButton.classList.toggle('muted', !soundEnabled);
+    }
+}
+
 // Event listeners
 spinButton.addEventListener('click', spinWheel);
 closeModalButton.addEventListener('click', closeModal);
+if (printOfferButton) printOfferButton.addEventListener('click', printOffer);
+if (soundToggleButton) soundToggleButton.addEventListener('click', toggleSound);
 modal.addEventListener('click', (e) => {
     if (e.target === modal) {
         closeModal();
