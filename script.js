@@ -233,43 +233,40 @@ function spinWheel() {
     
     console.log('Selected offer index:', targetOfferIndex, 'Offer:', offers[targetOfferIndex].text, offers[targetOfferIndex].subtext);
     
-    // The pointer is at the top (12 o'clock position = -PI/2)
-    // When currentRotation = 0, segment 0 starts at angle 0 (3 o'clock)
-    // We need to rotate so that the target segment CENTER is under the pointer
-    
-    // Target segment occupies angles from: targetOfferIndex * segmentAngle to (targetOfferIndex + 1) * segmentAngle
-    // Center of target segment is at: targetOfferIndex * segmentAngle + segmentAngle/2
-    
-    // After applying currentRotation, this center will be at:
-    // (targetOfferIndex * segmentAngle + segmentAngle/2) + currentRotation
-    
-    // We want this to equal the pointer angle (-PI/2):
-    // (targetOfferIndex * segmentAngle + segmentAngle/2) + currentRotation = -PI/2
-    // currentRotation = -PI/2 - (targetOfferIndex * segmentAngle + segmentAngle/2)
+    // ROTATION LOGIC:
+    // - Segments are drawn from angle: index * segmentAngle + currentRotation
+    // - Pointer is at: -PI/2 (top of wheel, 12 o'clock)
+    // - We want segment[targetOfferIndex] to be centered under the pointer
+    //
+    // Segment center in world space = (targetOfferIndex * segmentAngle + segmentAngle/2) + currentRotation
+    // We want this to equal -PI/2:
+    // (targetOfferIndex * segmentAngle + segmentAngle/2) + targetRotation = -PI/2
+    // But we also need to account for multiple full rotations landing at the same visual position
+    //
+    // So: targetRotation = -PI/2 - targetOfferIndex * segmentAngle - segmentAngle/2 + 2*PI*k (for any integer k)
     
     const targetSegmentCenter = targetOfferIndex * segmentAngle + segmentAngle / 2;
+    
+    // We'll add random offset and full spins
     const randomOffsetWithinSegment = (Math.random() - 0.5) * segmentAngle * 0.6;
-    const targetRotation = -Math.PI / 2 - targetSegmentCenter + randomOffsetWithinSegment;
+    
+    // Base target (might be negative)
+    let baseTarget = -Math.PI / 2 - targetSegmentCenter + randomOffsetWithinSegment;
+    
+    console.log('Target segment center:', targetSegmentCenter, 'Base target rotation:', baseTarget);
 
     // Random number of full rotations (3-6 spins)
     const minSpins = 3;
     const maxSpins = 6;
     const spins = Math.random() * (maxSpins - minSpins) + minSpins;
     
-    // Calculate total rotation needed
-    const currentNormalized = ((currentRotation % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
+    // Add the full spins to baseTarget
+    const targetRotation = baseTarget + spins * 2 * Math.PI;
     
-    // We need to get from currentNormalized to targetRotation
-    // Since targetRotation might be negative, normalize it first
-    const targetNormalized = ((targetRotation % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
+    // Calculate how much rotation we need from current position
+    const totalRotation = targetRotation - currentRotation;
     
-    // Calculate shortest rotation to target
-    let rotationNeeded = targetNormalized - currentNormalized;
-    if (rotationNeeded < 0) {
-        rotationNeeded += 2 * Math.PI;
-    }
-    
-    const totalRotation = spins * 2 * Math.PI + rotationNeeded;
+    console.log('Current rotation:', currentRotation, 'Target rotation:', targetRotation, 'Total rotation needed:', totalRotation);
     
     const duration = gameConfig.appearance?.spinDuration || 4000; // From config
     const startTime = Date.now();
@@ -308,25 +305,29 @@ function spinWheel() {
             // Remove glow effect
             canvas.classList.remove('spinning');
             
-            // Normalize rotation
-            currentRotation = currentRotation % (2 * Math.PI);
+            // Don't normalize - keep the final rotation as is for accurate calculation
+            const finalRotation = currentRotation;
             
             // Calculate which segment is under the pointer after rotation
             // Pointer is at top (270 degrees or -PI/2 or 3*PI/2)
             const pointerAngle = -Math.PI / 2;
             
-            // Each segment starts at: index * segmentAngle + currentRotation
+            // Each segment starts at: index * segmentAngle + finalRotation
             // The pointer points to angle -PI/2 in the canvas coordinate system
             // We need to find which segment contains this angle
             
             // Normalize the pointer angle relative to the current rotation
-            const relativePointerAngle = ((pointerAngle - currentRotation) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI);
+            const relativePointerAngle = ((pointerAngle - finalRotation) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI);
             
             // Find which segment this angle falls into
-            const landedSegmentIndex = Math.floor(relativePointerAngle / segmentAngle);
+            const landedSegmentIndex = Math.floor(relativePointerAngle / segmentAngle) % offers.length;
             
             console.log('Landed on segment:', landedSegmentIndex, 'Expected:', targetOfferIndex);
             console.log('Landed offer:', offers[landedSegmentIndex].text, offers[landedSegmentIndex].subtext);
+            console.log('FinalRotation:', finalRotation, 'RelativePointer:', relativePointerAngle, 'SegmentAngle:', segmentAngle);
+            
+            // Normalize rotation for next spin
+            currentRotation = finalRotation % (2 * Math.PI);
             
             // Use the pre-determined winning offer
             const winningOffer = offers[targetOfferIndex];
