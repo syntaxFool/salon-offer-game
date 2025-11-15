@@ -25,6 +25,60 @@ const offerCode = document.getElementById('offerCode');
 let currentRotation = 0;
 let isSpinning = false;
 
+// Confetti configuration
+function createConfetti() {
+    const colors = ['#d4af37', '#f4d03f', '#ff006e', '#3a86ff', '#06a77d', '#fb5607'];
+    const confettiCount = 50;
+    
+    for (let i = 0; i < confettiCount; i++) {
+        setTimeout(() => {
+            const confetti = document.createElement('div');
+            confetti.className = 'confetti';
+            confetti.style.left = Math.random() * 100 + '%';
+            confetti.style.top = '-10px';
+            confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+            confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
+            confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
+            confetti.style.animationDelay = (Math.random() * 0.5) + 's';
+            
+            // Random shapes
+            if (Math.random() > 0.5) {
+                confetti.style.borderRadius = '50%';
+            }
+            
+            document.body.appendChild(confetti);
+            
+            setTimeout(() => confetti.remove(), 4000);
+        }, i * 30);
+    }
+}
+
+// Create sparkles around the wheel
+function createSparkles(x, y) {
+    for (let i = 0; i < 5; i++) {
+        setTimeout(() => {
+            const sparkle = document.createElement('div');
+            sparkle.className = 'sparkle';
+            sparkle.style.left = x + (Math.random() * 40 - 20) + 'px';
+            sparkle.style.top = y + (Math.random() * 40 - 20) + 'px';
+            document.querySelector('.wheel-container').appendChild(sparkle);
+            
+            setTimeout(() => sparkle.remove(), 1000);
+        }, i * 50);
+    }
+}
+
+// Sound trigger points (placeholder - can be hooked up to actual sound files)
+function playTickSound() {
+    // Add your sound file here: new Audio('tick.mp3').play();
+    console.log('🔊 Tick!');
+}
+
+function playWinSound() {
+    // Add your sound file here: new Audio('win.mp3').play();
+    console.log('🔊 Winner!');
+}
+
 // Draw the wheel
 function drawWheel() {
     const centerX = canvas.width / 2;
@@ -120,6 +174,9 @@ function spinWheel() {
     isSpinning = true;
     spinButton.disabled = true;
     spinButton.textContent = 'SPINNING...';
+    
+    // Add glow effect to wheel
+    canvas.classList.add('spinning');
 
     // Random number of rotations (3-6 full spins)
     const minSpins = 3;
@@ -133,6 +190,10 @@ function spinWheel() {
     const duration = 4000; // 4 seconds
     const startTime = Date.now();
     const startRotation = currentRotation;
+    
+    // For tick sounds
+    let lastSegment = -1;
+    const segmentAngle = (2 * Math.PI) / offers.length;
 
     function animate() {
         const now = Date.now();
@@ -144,10 +205,26 @@ function spinWheel() {
         
         currentRotation = startRotation + totalRotation * easeOut;
         drawWheel();
+        
+        // Trigger tick sound when crossing segment boundaries
+        const currentSegment = Math.floor((currentRotation % (2 * Math.PI)) / segmentAngle);
+        if (currentSegment !== lastSegment && progress < 0.95) {
+            playTickSound();
+            lastSegment = currentSegment;
+            
+            // Create sparkles occasionally during spin
+            if (Math.random() > 0.7) {
+                const rect = canvas.getBoundingClientRect();
+                createSparkles(rect.width / 2, rect.height / 2);
+            }
+        }
 
         if (progress < 1) {
             requestAnimationFrame(animate);
         } else {
+            // Remove glow effect
+            canvas.classList.remove('spinning');
+            
             // Normalize rotation
             currentRotation = currentRotation % (2 * Math.PI);
             
@@ -170,8 +247,10 @@ function spinWheel() {
             const winningIndex = Math.floor(angle / segmentAngle) % offers.length;
             const winningOffer = offers[winningIndex];
             
-            // Show result
+            // Show result with effects
             setTimeout(() => {
+                playWinSound();
+                createConfetti();
                 showResult(winningOffer);
                 isSpinning = false;
                 spinButton.disabled = false;
