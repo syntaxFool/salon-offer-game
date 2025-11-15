@@ -39,28 +39,69 @@ const offers = gameConfig.offers;
 
 // Sound state
 let soundEnabled = true;
+let audioContext = null;
 
-// Load sound files (create simple beep sounds if files don't exist)
-const tickSound = new Audio();
-const winSound = new Audio();
+// Initialize audio context on first user interaction
+function initAudioContext() {
+    if (!audioContext) {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    return audioContext;
+}
 
-// Create simple beep sounds using Web Audio API as fallback
-function createBeepSound(frequency, duration) {
-    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    const oscillator = audioContext.createOscillator();
-    const gainNode = audioContext.createGain();
-    
-    oscillator.connect(gainNode);
-    gainNode.connect(audioContext.destination);
-    
-    oscillator.frequency.value = frequency;
-    oscillator.type = 'sine';
-    
-    gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
-    
-    oscillator.start(audioContext.currentTime);
-    oscillator.stop(audioContext.currentTime + duration);
+// Create tick sound
+function playTickSound() {
+    if (!soundEnabled) return;
+    try {
+        const ctx = initAudioContext();
+        const oscillator = ctx.createOscillator();
+        const gainNode = ctx.createGain();
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(ctx.destination);
+        
+        oscillator.frequency.value = 800;
+        oscillator.type = 'sine';
+        
+        gainNode.gain.setValueAtTime(0.1, ctx.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.05);
+        
+        oscillator.start(ctx.currentTime);
+        oscillator.stop(ctx.currentTime + 0.05);
+    } catch (e) {
+        // Silent fail
+    }
+}
+
+// Create win sound (celebration melody)
+function playWinSound() {
+    if (!soundEnabled) return;
+    try {
+        const ctx = initAudioContext();
+        const notes = [523.25, 587.33, 659.25, 783.99]; // C5, D5, E5, G5
+        
+        notes.forEach((freq, index) => {
+            const oscillator = ctx.createOscillator();
+            const gainNode = ctx.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(ctx.destination);
+            
+            oscillator.frequency.value = freq;
+            oscillator.type = 'sine';
+            
+            const startTime = ctx.currentTime + (index * 0.1);
+            const duration = 0.15;
+            
+            gainNode.gain.setValueAtTime(0.15, startTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, startTime + duration);
+            
+            oscillator.start(startTime);
+            oscillator.stop(startTime + duration);
+        });
+    } catch (e) {
+        // Silent fail
+    }
 }
 
 // Apply appearance settings
@@ -154,37 +195,6 @@ function createSparkles(x, y) {
             
             setTimeout(() => sparkle.remove(), 1000);
         }, i * 50);
-    }
-}
-
-// Sound trigger points (placeholder - can be hooked up to actual sound files)
-function playTickSound() {
-    if (!soundEnabled) return;
-    try {
-        // Try to play audio file first, fallback to beep
-        if (tickSound.src) {
-            tickSound.currentTime = 0;
-            tickSound.play().catch(() => createBeepSound(800, 0.05));
-        } else {
-            createBeepSound(800, 0.05);
-        }
-    } catch (e) {
-        // Silent fail if audio not supported
-    }
-}
-
-function playWinSound() {
-    if (!soundEnabled) return;
-    try {
-        // Try to play audio file first, fallback to beep
-        if (winSound.src) {
-            winSound.currentTime = 0;
-            winSound.play().catch(() => createBeepSound(1200, 0.3));
-        } else {
-            createBeepSound(1200, 0.3);
-        }
-    } catch (e) {
-        // Silent fail if audio not supported
     }
 }
 
@@ -461,7 +471,10 @@ function toggleSound() {
 }
 
 // Event listeners
-spinButton.addEventListener('click', spinWheel);
+spinButton.addEventListener('click', () => {
+    initAudioContext(); // Initialize audio on first click
+    spinWheel();
+});
 closeModalButton.addEventListener('click', closeModal);
 if (printOfferButton) printOfferButton.addEventListener('click', printOffer);
 if (soundToggleButton) soundToggleButton.addEventListener('click', toggleSound);
