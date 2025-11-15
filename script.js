@@ -382,9 +382,63 @@ function spinWheel() {
 
 // Show result modal
 function showResult(offer) {
+    const code = generateOfferCode();
     offerResult.textContent = offer.description;
-    offerCode.textContent = generateOfferCode();
+    offerCode.textContent = code;
     modal.classList.add('show');
+    
+    // Log to Google Sheets
+    logSpinToGoogleSheets(offer, code);
+}
+
+// Log spin to Google Sheets
+function logSpinToGoogleSheets(offer, code) {
+    // Check if logging is enabled
+    if (!gameConfig.logging || !gameConfig.logging.enabled || !gameConfig.logging.googleSheetUrl) {
+        return; // Logging disabled or no URL configured
+    }
+    
+    try {
+        // Detect device type
+        const deviceType = /mobile/i.test(navigator.userAgent) ? 'Mobile' : 
+                          /tablet/i.test(navigator.userAgent) ? 'Tablet' : 'Desktop';
+        
+        // Detect browser
+        const userAgent = navigator.userAgent;
+        let browser = 'Unknown';
+        if (userAgent.indexOf('Firefox') > -1) browser = 'Firefox';
+        else if (userAgent.indexOf('Chrome') > -1) browser = 'Chrome';
+        else if (userAgent.indexOf('Safari') > -1) browser = 'Safari';
+        else if (userAgent.indexOf('Edge') > -1) browser = 'Edge';
+        else if (userAgent.indexOf('MSIE') > -1 || userAgent.indexOf('Trident') > -1) browser = 'IE';
+        
+        // Prepare data
+        const data = {
+            offerText: offer.text + (offer.subtext ? ' ' + offer.subtext : '') + (offer.subtext2 ? ' ' + offer.subtext2 : ''),
+            offerDescription: offer.description,
+            offerCode: code,
+            deviceType: deviceType,
+            browser: browser,
+            screenSize: `${window.screen.width}x${window.screen.height}`,
+            userAgent: userAgent
+        };
+        
+        // Send to Google Sheets (async, fire and forget)
+        fetch(gameConfig.logging.googleSheetUrl, {
+            method: 'POST',
+            mode: 'no-cors', // Required for Google Apps Script
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data)
+        }).catch(err => {
+            // Silent fail - don't disrupt user experience
+            console.warn('Failed to log spin:', err);
+        });
+    } catch (error) {
+        // Silent fail
+        console.warn('Error logging spin:', error);
+    }
 }
 
 // Close modal

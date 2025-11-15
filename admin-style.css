@@ -587,6 +587,68 @@ body {
     border-color: #d4af37;
 }
 
+/* Google Sheets Logging Section */
+.logging-section {
+    margin-bottom: 40px;
+    padding: 30px;
+    background: linear-gradient(135deg, #e8f0ff 0%, #fff 100%);
+    border-radius: 16px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    border-left: 5px solid #667eea;
+}
+
+.logging-section h2 {
+    color: #333;
+    margin-bottom: 15px;
+    font-size: 2em;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.section-description {
+    color: #666;
+    margin-bottom: 25px;
+    font-size: 0.95em;
+    line-height: 1.6;
+}
+
+.section-description a {
+    color: #667eea;
+    font-weight: 600;
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.3s ease;
+}
+
+.section-description a:hover {
+    border-bottom-color: #667eea;
+}
+
+.full-width {
+    grid-column: 1 / -1;
+}
+
+.setting-item small {
+    display: block;
+    color: #999;
+    font-size: 0.85em;
+    margin-top: 6px;
+    font-style: italic;
+}
+
+.setting-item input[type="checkbox"] {
+    width: auto;
+    margin-right: 8px;
+}
+
+.setting-item label:has(input[type="checkbox"]) {
+    flex-direction: row;
+    align-items: center;
+    cursor: pointer;
+}
+
 /* Status Messages */
 .status-message {
     position: fixed;

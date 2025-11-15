@@ -45,6 +45,10 @@ const defaultConfig = {
         footerText: "We appreciate your business! See you soon! 💇‍♀️✨",
         spinDuration: 4000,
         confettiCount: 50
+    },
+    logging: {
+        enabled: true,
+        googleSheetUrl: ''
     }
 };
 
@@ -185,6 +189,12 @@ function renderAppearance() {
     document.getElementById('footerText').value = config.appearance.footerText;
     document.getElementById('spinDuration').value = config.appearance.spinDuration;
     document.getElementById('confettiCount').value = config.appearance.confettiCount;
+    
+    // Render logging settings
+    if (config.logging) {
+        document.getElementById('googleSheetUrl').value = config.logging.googleSheetUrl || '';
+        document.getElementById('enableLogging').checked = config.logging.enabled !== false;
+    }
 }
 
 // Attach event listeners to offer inputs
@@ -278,6 +288,11 @@ document.getElementById('saveBtn').addEventListener('click', () => {
     config.appearance.footerText = document.getElementById('footerText').value;
     config.appearance.spinDuration = parseInt(document.getElementById('spinDuration').value);
     config.appearance.confettiCount = parseInt(document.getElementById('confettiCount').value);
+    
+    // Update logging settings
+    if (!config.logging) config.logging = {};
+    config.logging.googleSheetUrl = document.getElementById('googleSheetUrl').value.trim();
+    config.logging.enabled = document.getElementById('enableLogging').checked;
     
     saveConfig(config);
     showStatus('✅ Configuration saved successfully!', 'success');

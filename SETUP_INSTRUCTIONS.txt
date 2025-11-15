@@ -1,0 +1,115 @@
+═══════════════════════════════════════════════════════════════
+  SALON WHEEL - GOOGLE SHEETS LOGGING SETUP GUIDE
+═══════════════════════════════════════════════════════════════
+
+STEP 1: CREATE YOUR GOOGLE SHEET
+─────────────────────────────────────────────────────────────
+
+1. Go to: https://sheets.google.com
+2. Click "+ Blank" to create a new spreadsheet
+3. Name it: "Salon Wheel Spin Logs"
+4. The sheet will auto-create headers when first spin is logged
+
+
+STEP 2: ADD THE APPS SCRIPT
+─────────────────────────────────────────────────────────────
+
+1. In your Google Sheet, click: Extensions → Apps Script
+2. Delete any existing code in the editor
+3. Open the file: GoogleAppsScript.js (in your project folder)
+4. Copy ALL the code from GoogleAppsScript.js
+5. Paste it into the Apps Script editor
+6. Click the 💾 Save icon (or Ctrl+S)
+7. Name your project: "Salon Spin Logger"
+
+
+STEP 3: DEPLOY AS WEB APP
+─────────────────────────────────────────────────────────────
+
+1. In Apps Script, click: Deploy → New deployment
+2. Click the gear icon ⚙️ next to "Select type"
+3. Choose: "Web app"
+4. Fill in the settings:
+   
+   Description: Salon Wheel Logger
+   Execute as: Me (your email)
+   Who has access: Anyone
+   
+5. Click "Deploy"
+6. Click "Authorize access"
+7. Choose your Google account
+8. Click "Advanced" → "Go to Salon Spin Logger (unsafe)"
+9. Click "Allow"
+10. COPY THE WEB APP URL (it looks like):
+    https://script.google.com/macros/s/AKfycby.../exec
+
+
+STEP 4: ADD URL TO ADMIN PANEL
+─────────────────────────────────────────────────────────────
+
+1. Open your admin panel: https://salon-offer-spin.netlify.app/admin.html
+2. Login with password: salon2025
+3. Scroll to the bottom
+4. Find "Google Sheets Logging" section
+5. Paste your Web App URL
+6. Click "Save Configuration"
+
+
+STEP 5: TEST IT
+─────────────────────────────────────────────────────────────
+
+1. Go to: https://salon-offer-spin.netlify.app
+2. Click "SPIN THE WHEEL"
+3. Wait for result
+4. Go back to your Google Sheet
+5. You should see a new row with:
+   - Timestamp
+   - Date & Time
+   - Offer won
+   - Offer code
+   - Device info
+
+
+═══════════════════════════════════════════════════════════════
+
+WHAT DATA IS LOGGED?
+─────────────────────────────────────────────────────────────
+
+✓ Timestamp (when the spin happened)
+✓ Date (YYYY-MM-DD format)
+✓ Time (HH:MM:SS format)
+✓ Offer Text (e.g., "10% OFF", "FREE")
+✓ Offer Description (e.g., "10% off your next service")
+✓ Offer Code (e.g., "SALON-A3B7C9")
+✓ Device Type (Mobile/Desktop/Tablet)
+✓ Browser (Chrome, Safari, Firefox, etc.)
+✓ Screen Size (e.g., "1920x1080")
+✓ User Agent (full browser/device string)
+
+
+TROUBLESHOOTING
+─────────────────────────────────────────────────────────────
+
+Problem: "Not logging spins"
+→ Check if Web App URL is saved in admin panel
+→ Verify URL ends with /exec (not /dev)
+→ Make sure deployment is set to "Anyone" can access
+
+Problem: "Authorization error"
+→ Redeploy the web app
+→ Make sure you clicked "Allow" during authorization
+
+Problem: "Headers appear twice"
+→ Normal! First row creates headers, ignore duplicates
+→ Manually delete extra header rows if needed
+
+
+NEED HELP?
+─────────────────────────────────────────────────────────────
+
+1. Check the browser console (F12) for error messages
+2. Verify the Web App URL is correct
+3. Make sure the sheet isn't protected/read-only
+4. Try redeploying the Apps Script web app
+
+═══════════════════════════════════════════════════════════════
