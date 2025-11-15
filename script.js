@@ -260,13 +260,25 @@ function spinWheel() {
     const maxSpins = 6;
     const spins = Math.random() * (maxSpins - minSpins) + minSpins;
     
-    // Add the full spins to baseTarget
-    const targetRotation = baseTarget + spins * 2 * Math.PI;
+    // Normalize current rotation to [0, 2*PI)
+    const currentNormalized = ((currentRotation % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
     
-    // Calculate how much rotation we need from current position
-    const totalRotation = targetRotation - currentRotation;
+    // Normalize base target to [0, 2*PI)
+    const baseTargetNormalized = ((baseTarget % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
     
-    console.log('Current rotation:', currentRotation, 'Target rotation:', targetRotation, 'Total rotation needed:', totalRotation);
+    // Find shortest path to target within one rotation
+    let rotationWithinCircle = baseTargetNormalized - currentNormalized;
+    
+    // If negative, we need to go the other way (add full circle)
+    if (rotationWithinCircle < 0) {
+        rotationWithinCircle += 2 * Math.PI;
+    }
+    
+    // Add the full spins
+    const totalRotation = spins * 2 * Math.PI + rotationWithinCircle;
+    const targetRotation = currentRotation + totalRotation;
+    
+    console.log('Current (normalized):', currentNormalized, 'Target (normalized):', baseTargetNormalized, 'Rotation within circle:', rotationWithinCircle, 'Total rotation:', totalRotation);
     
     const duration = gameConfig.appearance?.spinDuration || 4000; // From config
     const startTime = Date.now();
