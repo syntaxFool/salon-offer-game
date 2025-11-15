@@ -233,15 +233,19 @@ function spinWheel() {
     
     console.log('Selected offer index:', targetOfferIndex, 'Offer:', offers[targetOfferIndex].text, offers[targetOfferIndex].subtext);
     
-    // Calculate the angle where this offer should land under the pointer
-    // Pointer is at top (-PI/2), so we need to position the target segment there
-    const targetSegmentMiddle = targetOfferIndex * segmentAngle + segmentAngle / 2;
-    const pointerAngle = -Math.PI / 2;
+    // The pointer is at the top (12 o'clock position)
+    // Segments are drawn starting from 0 at the 3 o'clock position (0 radians)
+    // We need to rotate so the target segment's CENTER is at the top (-PI/2)
     
-    // Calculate how much we need to rotate to land on target
-    // Add randomness within the segment for natural feel
+    // Calculate the target segment's starting angle when rotation is 0
+    const targetSegmentStart = targetOfferIndex * segmentAngle;
+    const targetSegmentCenter = targetSegmentStart + segmentAngle / 2;
+    
+    // The pointer is at -PI/2, so we need to rotate to align the segment center with it
+    // Rotation moves counter-clockwise, so we need: targetSegmentCenter + rotation = -PI/2
+    // Therefore: rotation = -PI/2 - targetSegmentCenter
     const randomOffsetWithinSegment = (Math.random() - 0.5) * segmentAngle * 0.6;
-    const targetAngle = targetSegmentMiddle + randomOffsetWithinSegment;
+    const targetRotation = -Math.PI / 2 - targetSegmentCenter + randomOffsetWithinSegment;
 
     // Random number of full rotations (3-6 spins)
     const minSpins = 3;
@@ -250,7 +254,17 @@ function spinWheel() {
     
     // Calculate total rotation needed
     const currentNormalized = ((currentRotation % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
-    let rotationNeeded = (pointerAngle - targetAngle - currentNormalized + 2 * Math.PI) % (2 * Math.PI);
+    
+    // We need to get from currentNormalized to targetRotation
+    // Since targetRotation might be negative, normalize it first
+    const targetNormalized = ((targetRotation % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
+    
+    // Calculate shortest rotation to target
+    let rotationNeeded = targetNormalized - currentNormalized;
+    if (rotationNeeded < 0) {
+        rotationNeeded += 2 * Math.PI;
+    }
+    
     const totalRotation = spins * 2 * Math.PI + rotationNeeded;
     
     const duration = gameConfig.appearance?.spinDuration || 4000; // From config
