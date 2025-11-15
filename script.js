@@ -1,18 +1,67 @@
-// Salon offers and discounts - WCAG AA compliant palette
-const offers = [
-    { text: "10% OFF", description: "10% off your next service", color: "#264653", textColor: "#ffffff" },
-    { text: "15% OFF", description: "15% off your next service", color: "#2a9d8f", textColor: "#ffffff" },
-    { text: "20% OFF", description: "20% off your next service", color: "#e76f51", textColor: "#000000" },
-    { text: "25% OFF", description: "25% off your next service", color: "#f4a261", textColor: "#000000" },
-    { text: "30% OFF", description: "30% off your next service", color: "#e63946", textColor: "#ffffff" },
-    { text: "FREE", description: "Free manicure service", subtext: "Manicure", color: "#8338ec", textColor: "#ffffff" },
-    { text: "FREE", description: "Free blowout service", subtext: "Blowout", color: "#fb5607", textColor: "#000000" },
-    { text: "5% OFF", description: "5% off your next service", color: "#3a86ff", textColor: "#ffffff" },
-    { text: "50% OFF", description: "50% off your next haircut", subtext: "Haircut", color: "#ffbe0b", textColor: "#000000" },
-    { text: "FREE", description: "Free deep conditioning treatment", subtext: "Deep", subtext2: "Condition", color: "#06a77d", textColor: "#ffffff" },
-    { text: "35% OFF", description: "35% off your next service", color: "#c1121f", textColor: "#ffffff" },
-    { text: "FREE", description: "Free scalp massage (15 min)", subtext: "Scalp", subtext2: "Massage", color: "#ff006e", textColor: "#ffffff" }
-];
+// Load configuration from localStorage or use defaults
+function loadGameConfig() {
+    const saved = localStorage.getItem('salonWheelConfig');
+    if (saved) {
+        return JSON.parse(saved);
+    }
+    // Default configuration
+    return {
+        offers: [
+            { text: "10% OFF", description: "10% off your next service", color: "#264653", textColor: "#ffffff", weight: 10, subtext: "", subtext2: "" },
+            { text: "15% OFF", description: "15% off your next service", color: "#2a9d8f", textColor: "#ffffff", weight: 8, subtext: "", subtext2: "" },
+            { text: "20% OFF", description: "20% off your next service", color: "#e76f51", textColor: "#000000", weight: 6, subtext: "", subtext2: "" },
+            { text: "25% OFF", description: "25% off your next service", color: "#f4a261", textColor: "#000000", weight: 4, subtext: "", subtext2: "" },
+            { text: "30% OFF", description: "30% off your next service", color: "#e63946", textColor: "#ffffff", weight: 2, subtext: "", subtext2: "" },
+            { text: "FREE", description: "Free manicure service", subtext: "Manicure", color: "#8338ec", textColor: "#ffffff", weight: 3, subtext2: "" },
+            { text: "FREE", description: "Free blowout service", subtext: "Blowout", color: "#fb5607", textColor: "#000000", weight: 3, subtext2: "" },
+            { text: "5% OFF", description: "5% off your next service", color: "#3a86ff", textColor: "#ffffff", weight: 80, subtext: "", subtext2: "" },
+            { text: "50% OFF", description: "50% off your next haircut", subtext: "Haircut", color: "#ffbe0b", textColor: "#000000", weight: 1, subtext2: "" },
+            { text: "FREE", description: "Free deep conditioning treatment", subtext: "Deep", subtext2: "Condition", color: "#06a77d", textColor: "#ffffff", weight: 3 },
+            { text: "35% OFF", description: "35% off your next service", color: "#c1121f", textColor: "#ffffff", weight: 2, subtext: "", subtext2: "" },
+            { text: "FREE", description: "Free scalp massage (15 min)", subtext: "Scalp", subtext2: "Massage", color: "#ff006e", textColor: "#ffffff", weight: 3 }
+        ],
+        appearance: {
+            headerText: "🌟 Thank You for Your Visit! 🌟",
+            subtitleText: "Spin the wheel to reveal your exclusive offer for next time!",
+            footerText: "We appreciate your business! See you soon! 💇‍♀️✨",
+            spinDuration: 4000,
+            confettiCount: 50
+        }
+    };
+}
+
+const gameConfig = loadGameConfig();
+const offers = gameConfig.offers;
+
+// Apply appearance settings
+document.addEventListener('DOMContentLoaded', () => {
+    if (gameConfig.appearance) {
+        const h1 = document.querySelector('h1');
+        const subtitle = document.querySelector('.subtitle');
+        const footer = document.querySelector('footer p');
+        
+        if (h1) h1.textContent = gameConfig.appearance.headerText;
+        if (subtitle) subtitle.textContent = gameConfig.appearance.subtitleText;
+        if (footer) footer.textContent = gameConfig.appearance.footerText;
+    }
+});
+
+// Calculate total weight for probability
+const totalWeight = offers.reduce((sum, offer) => sum + offer.weight, 0);
+
+// Function to select weighted random offer
+function selectWeightedOffer() {
+    const random = Math.random() * totalWeight;
+    let cumulativeWeight = 0;
+    
+    for (let i = 0; i < offers.length; i++) {
+        cumulativeWeight += offers[i].weight;
+        if (random < cumulativeWeight) {
+            return i;
+        }
+    }
+    return 0; // Fallback
+}
 
 const canvas = document.getElementById('wheel');
 const ctx = canvas.getContext('2d');
@@ -27,8 +76,8 @@ let isSpinning = false;
 
 // Confetti configuration
 function createConfetti() {
+    const confettiCount = gameConfig.appearance?.confettiCount || 50;
     const colors = ['#d4af37', '#f4d03f', '#ff006e', '#3a86ff', '#06a77d', '#fb5607'];
-    const confettiCount = 50;
     
     for (let i = 0; i < confettiCount; i++) {
         setTimeout(() => {
@@ -177,23 +226,37 @@ function spinWheel() {
     
     // Add glow effect to wheel
     canvas.classList.add('spinning');
+    
+    // Pre-determine the winning offer based on weighted probability
+    const targetOfferIndex = selectWeightedOffer();
+    const segmentAngle = (2 * Math.PI) / offers.length;
+    
+    // Calculate the angle where this offer should land under the pointer
+    // Pointer is at top (-PI/2), so we need to position the target segment there
+    const targetSegmentMiddle = targetOfferIndex * segmentAngle + segmentAngle / 2;
+    const pointerAngle = -Math.PI / 2;
+    
+    // Calculate how much we need to rotate to land on target
+    // Add randomness within the segment for natural feel
+    const randomOffsetWithinSegment = (Math.random() - 0.5) * segmentAngle * 0.6;
+    const targetAngle = targetSegmentMiddle + randomOffsetWithinSegment;
 
-    // Random number of rotations (3-6 full spins)
+    // Random number of full rotations (3-6 spins)
     const minSpins = 3;
     const maxSpins = 6;
     const spins = Math.random() * (maxSpins - minSpins) + minSpins;
     
-    // Random final position
-    const randomAngle = Math.random() * 2 * Math.PI;
-    const totalRotation = spins * 2 * Math.PI + randomAngle;
+    // Calculate total rotation needed
+    const currentNormalized = ((currentRotation % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
+    let rotationNeeded = (pointerAngle - targetAngle - currentNormalized + 2 * Math.PI) % (2 * Math.PI);
+    const totalRotation = spins * 2 * Math.PI + rotationNeeded;
     
-    const duration = 4000; // 4 seconds
+    const duration = gameConfig.appearance?.spinDuration || 4000; // From config
     const startTime = Date.now();
     const startRotation = currentRotation;
     
     // For tick sounds
     let lastSegment = -1;
-    const segmentAngle = (2 * Math.PI) / offers.length;
 
     function animate() {
         const now = Date.now();
@@ -228,24 +291,8 @@ function spinWheel() {
             // Normalize rotation
             currentRotation = currentRotation % (2 * Math.PI);
             
-            // Determine winning segment
-            // The pointer is at the top (12 o'clock), pointing down
-            // We need to find which segment is at the top position
-            const segmentAngle = (2 * Math.PI) / offers.length;
-            
-            // Since the wheel rotates clockwise and the pointer is at top
-            // We need to find which segment starts at or before the top position
-            // Top is at -PI/2 (or 3*PI/2) in standard coordinates
-            const pointerAngle = -Math.PI / 2;
-            
-            // Normalize the current rotation to positive
-            const normalizedRotation = ((currentRotation % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
-            
-            // Calculate which segment is at the pointer
-            // Subtract the rotation from pointer position to find the segment
-            let angle = ((pointerAngle - normalizedRotation) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI);
-            const winningIndex = Math.floor(angle / segmentAngle) % offers.length;
-            const winningOffer = offers[winningIndex];
+            // Use the pre-determined winning offer
+            const winningOffer = offers[targetOfferIndex];
             
             // Show result with effects
             setTimeout(() => {
