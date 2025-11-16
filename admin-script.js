@@ -48,7 +48,7 @@ const defaultConfig = {
     },
     logging: {
         enabled: true,
-        googleSheetUrl: ''
+        googleSheetUrl: 'https://script.google.com/macros/s/AKfycbzWUt986C1kl76LJX0xjhom6n2Ro-9gbBgVnhFJOMpoFpWOWHwuHnTdti-wlKdcWRt3gQ/exec'
     }
 };
 
