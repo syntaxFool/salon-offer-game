@@ -1,15 +1,7 @@
 // Load configuration from localStorage or use defaults
 function loadGameConfig() {
-    try {
-        const saved = localStorage.getItem('salonWheelConfig');
-        if (saved) {
-            return JSON.parse(saved);
-        }
-    } catch (error) {
-        console.warn('LocalStorage unavailable or error:', error);
-    }
-    // Default configuration
-    return {
+    // Default configuration with logging
+    const defaultConfig = {
         offers: [
             { text: "10% OFF", description: "10% off your next service", color: "#264653", textColor: "#ffffff", weight: 35, subtext: "", subtext2: "" },
             { text: "15% OFF", description: "15% off your next service", color: "#2a9d8f", textColor: "#ffffff", weight: 10, subtext: "", subtext2: "" },
@@ -36,7 +28,23 @@ function loadGameConfig() {
             googleSheetUrl: 'https://script.google.com/macros/s/AKfycbzWUt986C1kl76LJX0xjhom6n2Ro-9gbBgVnhFJOMpoFpWOWHwuHnTdti-wlKdcWRt3gQ/exec'
         }
     };
-}
+    
+    try {
+        const saved = localStorage.getItem('salonWheelConfig');
+        if (saved) {
+            const parsedConfig = JSON.parse(saved);
+            // Merge with defaults to ensure logging object exists
+            return {
+                ...defaultConfig,
+                ...parsedConfig,
+                logging: { ...defaultConfig.logging, ...(parsedConfig.logging || {}) }
+            };
+        }
+    } catch (error) {
+        console.warn('LocalStorage unavailable or error:', error);
+    }
+    
+    return defaultConfig;
 
 const gameConfig = loadGameConfig();
 const offers = gameConfig.offers;
