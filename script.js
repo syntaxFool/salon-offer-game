@@ -178,6 +178,12 @@ function playWinSound() {
 
 // Apply appearance settings
 document.addEventListener('DOMContentLoaded', () => {
+    // Initialize User Info Modal elements
+    userInfoModal = document.getElementById('userInfoModal');
+    userInfoForm = document.getElementById('userInfoForm');
+    userNameInput = document.getElementById('userName');
+    userMobileInput = document.getElementById('userMobile');
+    
     if (gameConfig.appearance) {
         const h1 = document.querySelector('h1');
         const subtitle = document.querySelector('.subtitle');
@@ -206,6 +212,84 @@ document.addEventListener('DOMContentLoaded', () => {
             showUserInfoModal();
         }
     }, 600);
+    
+    // ============================================
+    // Event Listeners (must be inside DOMContentLoaded)
+    // ============================================
+    
+    // Format mobile input as user types
+    if (userMobileInput) {
+        userMobileInput.addEventListener('input', (e) => {
+            e.target.value = formatMobileInput(e.target.value);
+        });
+    }
+
+    // Handle user info form submission
+    if (userInfoForm) {
+        userInfoForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const name = userNameInput.value.trim();
+            const mobile = userMobileInput.value.trim();
+            
+            // Validate inputs
+            if (!name) {
+                alert('Please enter your name');
+                userNameInput.focus();
+                return;
+            }
+            
+            if (!mobile) {
+                alert('Please enter your mobile number');
+                userMobileInput.focus();
+                return;
+            }
+            
+            if (!validateMobileNumber(mobile)) {
+                alert('Please enter a valid mobile number in format: +91XXXXXXXXXX');
+                userMobileInput.focus();
+                return;
+            }
+            
+            // Save user info
+            if (saveUserInfo(name, mobile)) {
+                closeUserInfoModal();
+                // Proceed with spin
+                executeSpinWheel();
+            } else {
+                alert('Error saving your information. Please try again.');
+            }
+        });
+    }
+
+    // Close user info modal on backdrop click
+    if (userInfoModal) {
+        userInfoModal.addEventListener('click', (e) => {
+            if (e.target === userInfoModal) {
+                // Prevent closing by clicking backdrop
+                console.log('Closing user info modal');
+            }
+        });
+    }
+
+    spinButton.addEventListener('click', () => {
+        initAudioContext();
+        spinWheel();
+    });
+
+    closeModalButton.addEventListener('click', closeModal);
+
+    if (saveOfferButton) {
+        saveOfferButton.addEventListener('click', saveOffer);
+    }
+
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            closeModal();
+        }
+    });
+
+    drawWheel();
 });
 
 // Calculate total weight for probability
@@ -235,10 +319,7 @@ const offerResult = document.getElementById('offerResult');
 const offerCode = document.getElementById('offerCode');
 
 // User Info Modal elements
-const userInfoModal = document.getElementById('userInfoModal');
-const userInfoForm = document.getElementById('userInfoForm');
-const userNameInput = document.getElementById('userName');
-const userMobileInput = document.getElementById('userMobile');
+let userInfoModal, userInfoForm, userNameInput, userMobileInput;
 
 let currentRotation = 0;
 let isSpinning = false;
@@ -903,76 +984,3 @@ function saveOffer() {
         saveWindow.print();
     }, 500);
 }
-
-// ============================================
-// User Info Form Event Listeners
-// ============================================
-
-// Format mobile input as user types
-userMobileInput.addEventListener('input', (e) => {
-    e.target.value = formatMobileInput(e.target.value);
-});
-
-// Handle user info form submission
-userInfoForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-    
-    const name = userNameInput.value.trim();
-    const mobile = userMobileInput.value.trim();
-    
-    // Validate inputs
-    if (!name) {
-        alert('Please enter your name');
-        userNameInput.focus();
-        return;
-    }
-    
-    if (!mobile) {
-        alert('Please enter your mobile number');
-        userMobileInput.focus();
-        return;
-    }
-    
-    if (!validateMobileNumber(mobile)) {
-        alert('Please enter a valid mobile number in format: +91XXXXXXXXXX');
-        userMobileInput.focus();
-        return;
-    }
-    
-    // Save user info
-    if (saveUserInfo(name, mobile)) {
-        closeUserInfoModal();
-        // Proceed with spin
-        executeSpinWheel();
-    } else {
-        alert('Error saving your information. Please try again.');
-    }
-});
-
-// Close user info modal on backdrop click
-userInfoModal.addEventListener('click', (e) => {
-    if (e.target === userInfoModal) {
-        // Prevent closing by clicking backdrop
-        // You can change this behavior if needed
-        console.log('Closing user info modal');
-    }
-});
-
-spinButton.addEventListener('click', () => {
-    initAudioContext();
-    spinWheel();
-});
-
-closeModalButton.addEventListener('click', closeModal);
-
-if (saveOfferButton) {
-    saveOfferButton.addEventListener('click', saveOffer);
-}
-
-modal.addEventListener('click', (e) => {
-    if (e.target === modal) {
-        closeModal();
-    }
-});
-
-drawWheel();
