@@ -310,6 +310,18 @@ document.getElementById('resetBtn').addEventListener('click', () => {
     }
 });
 
+// Clear all spins
+document.getElementById('clearSpinsBtn').addEventListener('click', () => {
+    if (confirm('Are you sure you want to clear ALL spin history? Users will be able to spin again.')) {
+        try {
+            localStorage.removeItem('salonWheelSpunUsers');
+            showStatus('🗑️ All spin history cleared! Users can now spin again.', 'success');
+        } catch (error) {
+            showStatus('❌ Error clearing spins: ' + error.message, 'error');
+        }
+    }
+});
+
 // Export configuration
 document.getElementById('exportBtn').addEventListener('click', () => {
     const dataStr = JSON.stringify(config, null, 2);

@@ -37,6 +37,78 @@ function loadGameConfig() {
 const gameConfig = loadGameConfig();
 const offers = gameConfig.offers;
 
+// ============================================
+// One Spin Per Person Feature
+// ============================================
+
+// Generate browser fingerprint for user identification
+function generateUserFingerprint() {
+    const fingerprint = {
+        userAgent: navigator.userAgent,
+        language: navigator.language,
+        screenWidth: window.screen.width,
+        screenHeight: window.screen.height,
+        screenDepth: window.screen.colorDepth,
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        hardwareConcurrency: navigator.hardwareConcurrency || 'unknown'
+    };
+    
+    // Create a simple hash from fingerprint
+    let hash = '';
+    for (let key in fingerprint) {
+        hash += JSON.stringify(fingerprint[key]);
+    }
+    
+    // Simple string hash function
+    let hashValue = 0;
+    for (let i = 0; i < hash.length; i++) {
+        const char = hash.charCodeAt(i);
+        hashValue = ((hashValue << 5) - hashValue) + char;
+        hashValue = hashValue & hashValue; // Convert to 32bit integer
+    }
+    return hashValue.toString(36);
+}
+
+// Check if user has already spun
+function hasUserSpun() {
+    try {
+        const fingerprint = generateUserFingerprint();
+        const spunUsers = JSON.parse(localStorage.getItem('salonWheelSpunUsers') || '{}');
+        return spunUsers.hasOwnProperty(fingerprint);
+    } catch (error) {
+        console.warn('Error checking spin history:', error);
+        return false;
+    }
+}
+
+// Record that user has spun
+function recordUserSpin() {
+    try {
+        const fingerprint = generateUserFingerprint();
+        const spunUsers = JSON.parse(localStorage.getItem('salonWheelSpunUsers') || '{}');
+        spunUsers[fingerprint] = {
+            timestamp: new Date().toISOString(),
+            offer: offerResult.textContent,
+            code: offerCode.textContent
+        };
+        localStorage.setItem('salonWheelSpunUsers', JSON.stringify(spunUsers));
+    } catch (error) {
+        console.warn('Error recording spin:', error);
+    }
+}
+
+// Get user's previous spin info
+function getUserPreviousSpin() {
+    try {
+        const fingerprint = generateUserFingerprint();
+        const spunUsers = JSON.parse(localStorage.getItem('salonWheelSpunUsers') || '{}');
+        return spunUsers[fingerprint] || null;
+    } catch (error) {
+        console.warn('Error retrieving spin info:', error);
+        return null;
+    }
+}
+
 // Sound state
 let soundEnabled = true;
 let audioContext = null;
@@ -110,6 +182,9 @@ document.addEventListener('DOMContentLoaded', () => {
             spinner.classList.add('hidden');
         }
     }, 500);
+    
+    // Check if user has already spun
+    checkAndDisableSpin();
 });
 
 // Calculate total weight for probability
@@ -272,8 +347,31 @@ function generateOfferCode() {
     return code;
 }
 
+// Check and disable spin button if user already spun
+function checkAndDisableSpin() {
+    if (hasUserSpun()) {
+        spinButton.disabled = true;
+        spinButton.textContent = 'ALREADY SPUN';
+        spinButton.style.opacity = '0.6';
+        spinButton.style.cursor = 'not-allowed';
+        spinButton.title = 'You have already used your one spin!';
+        
+        const previousSpin = getUserPreviousSpin();
+        if (previousSpin) {
+            const spinDate = new Date(previousSpin.timestamp).toLocaleDateString();
+            spinButton.title = `You already spun on ${spinDate}!`;
+        }
+    }
+}
+
 // Spin the wheel
 function spinWheel() {
+    // Check if user already spun
+    if (hasUserSpun()) {
+        alert('You have already used your one spin! Each person gets only one spin.');
+        return;
+    }
+    
     if (isSpinning) return;
     
     isSpinning = true;
@@ -386,6 +484,15 @@ function showResult(offer) {
     offerResult.textContent = offer.description;
     offerCode.textContent = code;
     modal.classList.add('show');
+    
+    // Record that this user has spun
+    recordUserSpin();
+    
+    // Disable spin button for future attempts
+    spinButton.disabled = true;
+    spinButton.textContent = 'ALREADY SPUN';
+    spinButton.style.opacity = '0.6';
+    spinButton.style.cursor = 'not-allowed';
     
     // Log to Google Sheets
     logSpinToGoogleSheets(offer, code);

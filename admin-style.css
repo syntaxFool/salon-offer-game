@@ -135,6 +135,15 @@ body {
     background: #138496;
 }
 
+.btn-danger {
+    background: #e63946;
+    color: white;
+}
+
+.btn-danger:hover {
+    background: #d62828;
+}
+
 .btn-back {
     background: #667eea;
     color: white;
