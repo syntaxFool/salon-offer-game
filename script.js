@@ -796,8 +796,13 @@ spinButton.addEventListener('click', () => {
     initAudioContext(); // Initialize audio on first click
     spinWheel();
 });
+
 closeModalButton.addEventListener('click', closeModal);
-if (saveOfferButton) saveOfferButton.addEventListener('click', saveOffer);
+
+if (saveOfferButton) {
+    saveOfferButton.addEventListener('click', saveOffer);
+}
+
 modal.addEventListener('click', (e) => {
     if (e.target === modal) {
         closeModal();
