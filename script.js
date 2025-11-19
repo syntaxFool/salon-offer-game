@@ -205,12 +205,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // Check if user has already spun
     checkAndDisableSpin();
     
-    // Show user info modal on page load if user hasn't provided info yet
+    // Show user info modal on page load (always show to collect user info)
     setTimeout(() => {
-        const savedUserInfo = getCurrentUserInfo();
-        if (!savedUserInfo && !hasUserSpun()) {
-            showUserInfoModal();
-        }
+        showUserInfoModal();
     }, 600);
     
     // ============================================
