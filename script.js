@@ -45,6 +45,7 @@ function loadGameConfig() {
     }
     
     return defaultConfig;
+}
 
 const gameConfig = loadGameConfig();
 const offers = gameConfig.offers;
