@@ -192,7 +192,6 @@ function renderAppearance() {
     
     // Render logging settings
     if (config.logging) {
-        document.getElementById('googleSheetUrl').value = config.logging.googleSheetUrl || '';
         document.getElementById('enableLogging').checked = config.logging.enabled !== false;
     }
 }
@@ -291,7 +290,6 @@ document.getElementById('saveBtn').addEventListener('click', () => {
     
     // Update logging settings
     if (!config.logging) config.logging = {};
-    config.logging.googleSheetUrl = document.getElementById('googleSheetUrl').value.trim();
     config.logging.enabled = document.getElementById('enableLogging').checked;
     
     saveConfig(config);
