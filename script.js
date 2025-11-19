@@ -198,6 +198,14 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Check if user has already spun
     checkAndDisableSpin();
+    
+    // Show user info modal on page load if user hasn't provided info yet
+    setTimeout(() => {
+        const savedUserInfo = getCurrentUserInfo();
+        if (!savedUserInfo && !hasUserSpun()) {
+            showUserInfoModal();
+        }
+    }, 600);
 });
 
 // Calculate total weight for probability
@@ -466,8 +474,15 @@ function spinWheel() {
         return;
     }
     
-    // Show user info modal
-    showUserInfoModal();
+    // Check if user info is provided
+    const userInfo = getCurrentUserInfo();
+    if (!userInfo) {
+        showUserInfoModal();
+        return;
+    }
+    
+    // Proceed with spin
+    executeSpinWheel();
 }
 
 // Execute the actual spin after user info is collected
