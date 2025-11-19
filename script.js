@@ -552,9 +552,9 @@ function logSpinToGoogleSheets(offer, code) {
         // Send to Google Sheets (async, fire and forget)
         fetch(gameConfig.logging.googleSheetUrl, {
             method: 'POST',
-            mode: 'no-cors', // Required for Google Apps Script
+            mode: 'no-cors',
             headers: {
-                'Content-Type': 'application/json',
+                'Content-Type': 'application/json'
             },
             body: JSON.stringify(data)
         }).then(() => {
