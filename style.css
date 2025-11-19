@@ -475,22 +475,23 @@ h1 {
 }
 
 .submit-button {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    border: none;
+    background: linear-gradient(135deg, #d4af37 0%, #f4d03f 100%);
+    color: #000000;
+    border: 2px solid #d4af37;
     padding: 14px 40px;
     font-size: 1.05em;
     font-weight: 700;
     border-radius: 50px;
     cursor: pointer;
-    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+    box-shadow: 0 8px 20px rgba(212, 175, 55, 0.4);
     transition: all 0.3s ease;
     width: 100%;
 }
 
 .submit-button:hover {
     transform: translateY(-3px);
-    box-shadow: 0 12px 30px rgba(102, 126, 234, 0.4);
+    box-shadow: 0 12px 30px rgba(212, 175, 55, 0.6);
+    background: linear-gradient(135deg, #f4d03f 0%, #d4af37 100%);
 }
 
 .submit-button:active {
