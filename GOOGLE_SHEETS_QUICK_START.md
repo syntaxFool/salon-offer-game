@@ -43,6 +43,8 @@
 
 Every spin automatically logs:
 - ⏰ Timestamp (date & time)
+- 👤 Customer Name
+- 📱 Mobile Number (+91 format)
 - 🎁 Offer won (text & description)
 - 🔑 Offer code generated
 - 📱 Device type (Mobile/Desktop/Tablet)

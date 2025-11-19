@@ -31,6 +31,8 @@ function doPost(e) {
         'Timestamp',
         'Date',
         'Time',
+        'Customer Name',
+        'Mobile Number',
         'Offer Text',
         'Offer Description',
         'Offer Code',
@@ -41,7 +43,7 @@ function doPost(e) {
       ]);
       
       // Format header row
-      const headerRange = sheet.getRange(1, 1, 1, 10);
+      const headerRange = sheet.getRange(1, 1, 1, 12);
       headerRange.setFontWeight('bold');
       headerRange.setBackground('#4a90e2');
       headerRange.setFontColor('#ffffff');
@@ -57,6 +59,8 @@ function doPost(e) {
       now,                        // Timestamp
       dateStr,                    // Date
       timeStr,                    // Time
+      data.customerName || '',    // Customer Name
+      data.mobileNumber || '',    // Mobile Number
       data.offerText || '',       // Offer Text (e.g., "10% OFF")
       data.offerDescription || '', // Offer Description
       data.offerCode || '',       // Generated Code
@@ -67,7 +71,7 @@ function doPost(e) {
     ]);
     
     // Auto-resize columns for readability
-    sheet.autoResizeColumns(1, 10);
+    sheet.autoResizeColumns(1, 12);
     
     // Return success response
     return ContentService
