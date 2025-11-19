@@ -30,6 +30,10 @@ function loadGameConfig() {
             footerText: "We appreciate your business! See you soon! 💇‍♀️✨",
             spinDuration: 4000,
             confettiCount: 50
+        },
+        logging: {
+            enabled: true,
+            googleSheetUrl: 'https://script.google.com/macros/s/AKfycbzWUt986C1kl76LJX0xjhom6n2Ro-9gbBgVnhFJOMpoFpWOWHwuHnTdti-wlKdcWRt3gQ/exec'
         }
     };
 }
@@ -502,7 +506,12 @@ function showResult(offer) {
 function logSpinToGoogleSheets(offer, code) {
     // Check if logging is enabled
     if (!gameConfig.logging || !gameConfig.logging.enabled || !gameConfig.logging.googleSheetUrl) {
-        return; // Logging disabled or no URL configured
+        console.log('Logging disabled or URL not configured', {
+            hasLogging: !!gameConfig.logging,
+            enabled: gameConfig.logging?.enabled,
+            hasUrl: !!gameConfig.logging?.googleSheetUrl
+        });
+        return;
     }
     
     try {
@@ -530,6 +539,8 @@ function logSpinToGoogleSheets(offer, code) {
             userAgent: userAgent
         };
         
+        console.log('Sending to Google Sheets:', data);
+        
         // Send to Google Sheets (async, fire and forget)
         fetch(gameConfig.logging.googleSheetUrl, {
             method: 'POST',
@@ -538,12 +549,12 @@ function logSpinToGoogleSheets(offer, code) {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify(data)
+        }).then(() => {
+            console.log('✅ Spin logged to Google Sheets');
         }).catch(err => {
-            // Silent fail - don't disrupt user experience
             console.warn('Failed to log spin:', err);
         });
     } catch (error) {
-        // Silent fail
         console.warn('Error logging spin:', error);
     }
 }
