@@ -780,20 +780,17 @@ function saveOffer() {
     const offerText = offerResult.textContent;
     const code = offerCode.textContent;
     
-    // Open in new window with instructions
     const saveWindow = window.open('', '_blank');
     saveWindow.document.write(generateOfferHTML(offerText, code));
     saveWindow.document.close();
     
-    // Show save dialog after short delay
     setTimeout(() => {
-        saveWindow.print(); // User can choose "Save as PDF" in print dialog
+        saveWindow.print();
     }, 500);
 }
 
-// Event listeners
 spinButton.addEventListener('click', () => {
-    initAudioContext(); // Initialize audio on first click
+    initAudioContext();
     spinWheel();
 });
 
@@ -809,5 +806,4 @@ modal.addEventListener('click', (e) => {
     }
 });
 
-// Initial draw
 drawWheel();
