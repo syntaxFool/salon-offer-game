@@ -418,7 +418,8 @@ function spinWheel() {
     const normalizedTarget = ((targetFinalRotation + randomOffset) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI);
     
     // Add full spins
-    const totalRotation = spins * 2 * Math.PI + (normalizedTarget - (currentRotation % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI));    const duration = gameConfig.appearance?.spinDuration || 4000; // From config
+    const totalRotation = spins * 2 * Math.PI + (normalizedTarget - (currentRotation % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI));
+    const duration = gameConfig.appearance?.spinDuration || 4000; // From config
     const startTime = Date.now();
     const startRotation = currentRotation;
     
