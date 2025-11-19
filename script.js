@@ -226,8 +226,15 @@ const saveOfferButton = document.getElementById('saveOffer');
 const offerResult = document.getElementById('offerResult');
 const offerCode = document.getElementById('offerCode');
 
+// User Info Modal elements
+const userInfoModal = document.getElementById('userInfoModal');
+const userInfoForm = document.getElementById('userInfoForm');
+const userNameInput = document.getElementById('userName');
+const userMobileInput = document.getElementById('userMobile');
+
 let currentRotation = 0;
 let isSpinning = false;
+let currentUserInfo = null; // Store current user info
 
 // Confetti configuration
 function createConfetti() {
@@ -360,6 +367,80 @@ function generateOfferCode() {
     return code;
 }
 
+// ============================================
+// User Info Collection Feature
+// ============================================
+
+// Validate mobile number format (+91 and 10 digits)
+function validateMobileNumber(mobile) {
+    const regex = /^\+91[0-9]{10}$/;
+    return regex.test(mobile);
+}
+
+// Format mobile input as user types (+91 format)
+function formatMobileInput(input) {
+    let value = input.replace(/\D/g, '');
+    
+    if (!value.startsWith('91')) {
+        if (value.length >= 1) {
+            value = '91' + value.slice(0, 10);
+        }
+    } else {
+        value = value.slice(0, 12);
+    }
+    
+    if (value.length >= 2) {
+        return '+' + value;
+    }
+    return value ? '+' + value : '';
+}
+
+// Save user info to localStorage
+function saveUserInfo(name, mobile) {
+    try {
+        const userInfo = {
+            name: name.trim(),
+            mobile: mobile.trim(),
+            timestamp: new Date().toISOString()
+        };
+        localStorage.setItem('salonWheelCurrentUserInfo', JSON.stringify(userInfo));
+        currentUserInfo = userInfo;
+        return true;
+    } catch (error) {
+        console.warn('Error saving user info:', error);
+        return false;
+    }
+}
+
+// Get current user info
+function getCurrentUserInfo() {
+    try {
+        if (currentUserInfo) return currentUserInfo;
+        const stored = localStorage.getItem('salonWheelCurrentUserInfo');
+        if (stored) {
+            currentUserInfo = JSON.parse(stored);
+            return currentUserInfo;
+        }
+    } catch (error) {
+        console.warn('Error retrieving user info:', error);
+    }
+    return null;
+}
+
+// Show user info modal
+function showUserInfoModal() {
+    userInfoForm.reset();
+    userNameInput.value = '';
+    userMobileInput.value = '';
+    userInfoModal.classList.add('show');
+    userNameInput.focus();
+}
+
+// Close user info modal
+function closeUserInfoModal() {
+    userInfoModal.classList.remove('show');
+}
+
 // Check and disable spin button if user already spun
 function checkAndDisableSpin() {
     if (hasUserSpun()) {
@@ -380,6 +461,18 @@ function checkAndDisableSpin() {
 // Spin the wheel
 function spinWheel() {
     // Check if user already spun
+    if (hasUserSpun()) {
+        alert('You have already used your one spin! Each person gets only one spin.');
+        return;
+    }
+    
+    // Show user info modal
+    showUserInfoModal();
+}
+
+// Execute the actual spin after user info is collected
+function executeSpinWheel() {
+    // Check if user already spun (double check)
     if (hasUserSpun()) {
         alert('You have already used your one spin! Each person gets only one spin.');
         return;
@@ -525,6 +618,9 @@ function logSpinToGoogleSheets(offer, code) {
     }
     
     try {
+        // Get user info
+        const userInfo = getCurrentUserInfo() || {};
+        
         // Detect device type
         const deviceType = /mobile/i.test(navigator.userAgent) ? 'Mobile' : 
                           /tablet/i.test(navigator.userAgent) ? 'Tablet' : 'Desktop';
@@ -538,15 +634,18 @@ function logSpinToGoogleSheets(offer, code) {
         else if (userAgent.indexOf('Edge') > -1) browser = 'Edge';
         else if (userAgent.indexOf('MSIE') > -1 || userAgent.indexOf('Trident') > -1) browser = 'IE';
         
-        // Prepare data
+        // Prepare data with user info
         const data = {
+            customerName: userInfo.name || 'N/A',
+            mobileNumber: userInfo.mobile || 'N/A',
             offerText: offer.text + (offer.subtext ? ' ' + offer.subtext : '') + (offer.subtext2 ? ' ' + offer.subtext2 : ''),
             offerDescription: offer.description,
             offerCode: code,
             deviceType: deviceType,
             browser: browser,
             screenSize: `${window.screen.width}x${window.screen.height}`,
-            userAgent: userAgent
+            userAgent: userAgent,
+            timestamp: new Date().toISOString()
         };
         
         console.log('Sending to Google Sheets:', data);
@@ -789,6 +888,60 @@ function saveOffer() {
         saveWindow.print();
     }, 500);
 }
+
+// ============================================
+// User Info Form Event Listeners
+// ============================================
+
+// Format mobile input as user types
+userMobileInput.addEventListener('input', (e) => {
+    e.target.value = formatMobileInput(e.target.value);
+});
+
+// Handle user info form submission
+userInfoForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    
+    const name = userNameInput.value.trim();
+    const mobile = userMobileInput.value.trim();
+    
+    // Validate inputs
+    if (!name) {
+        alert('Please enter your name');
+        userNameInput.focus();
+        return;
+    }
+    
+    if (!mobile) {
+        alert('Please enter your mobile number');
+        userMobileInput.focus();
+        return;
+    }
+    
+    if (!validateMobileNumber(mobile)) {
+        alert('Please enter a valid mobile number in format: +91XXXXXXXXXX');
+        userMobileInput.focus();
+        return;
+    }
+    
+    // Save user info
+    if (saveUserInfo(name, mobile)) {
+        closeUserInfoModal();
+        // Proceed with spin
+        executeSpinWheel();
+    } else {
+        alert('Error saving your information. Please try again.');
+    }
+});
+
+// Close user info modal on backdrop click
+userInfoModal.addEventListener('click', (e) => {
+    if (e.target === userInfoModal) {
+        // Prevent closing by clicking backdrop
+        // You can change this behavior if needed
+        console.log('Closing user info modal');
+    }
+});
 
 spinButton.addEventListener('click', () => {
     initAudioContext();

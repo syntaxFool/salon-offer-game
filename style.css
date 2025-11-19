@@ -403,6 +403,112 @@ h1 {
     transform: translateY(-1px);
 }
 
+/* User Info Form Styles */
+.user-info-modal {
+    max-width: 450px !important;
+}
+
+.modal-subtitle {
+    color: #666;
+    font-size: 1.05em;
+    margin-bottom: 25px;
+    font-weight: 400;
+}
+
+.user-info-form {
+    text-align: left;
+    margin: 20px 0;
+}
+
+.form-group {
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    color: #333;
+    font-weight: 600;
+    margin-bottom: 8px;
+    font-size: 1em;
+}
+
+.form-group input {
+    padding: 12px 15px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 1em;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    transition: all 0.3s ease;
+    background-color: #f9f9f9;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: #667eea;
+    background-color: white;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.form-group input::placeholder {
+    color: #999;
+}
+
+.form-help {
+    display: block;
+    color: #999;
+    font-size: 0.85em;
+    margin-top: 5px;
+}
+
+.form-actions {
+    margin-top: 30px;
+    display: flex;
+    justify-content: center;
+}
+
+.submit-button {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 14px 40px;
+    font-size: 1.05em;
+    font-weight: 700;
+    border-radius: 50px;
+    cursor: pointer;
+    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+    transition: all 0.3s ease;
+    width: 100%;
+}
+
+.submit-button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 30px rgba(102, 126, 234, 0.4);
+}
+
+.submit-button:active {
+    transform: translateY(-1px);
+}
+
+.submit-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.form-note {
+    color: #999;
+    font-size: 0.85em;
+    text-align: center;
+    margin-top: 15px;
+}
+
+.form-error {
+    color: #e63946;
+    font-size: 0.9em;
+    margin-top: 5px;
+}
+
 footer {
     text-align: center;
     margin-top: 25px;
