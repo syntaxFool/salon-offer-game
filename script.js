@@ -205,6 +205,12 @@ document.addEventListener('DOMContentLoaded', () => {
     // Check if user has already spun
     checkAndDisableSpin();
     
+    // Disable spin button until user info is collected
+    spinButton.disabled = true;
+    spinButton.textContent = 'PROVIDE DETAILS FIRST';
+    spinButton.style.opacity = '0.5';
+    spinButton.style.cursor = 'not-allowed';
+    
     // Show user info modal on page load (always show to collect user info)
     setTimeout(() => {
         showUserInfoModal();
@@ -525,6 +531,12 @@ function showUserInfoModal() {
 // Close user info modal
 function closeUserInfoModal() {
     userInfoModal.classList.remove('show');
+    
+    // Enable the spin button after user info is provided
+    spinButton.disabled = false;
+    spinButton.textContent = 'SPIN THE WHEEL';
+    spinButton.style.opacity = '1';
+    spinButton.style.cursor = 'pointer';
 }
 
 // Check and disable spin button if user already spun
@@ -552,14 +564,7 @@ function spinWheel() {
         return;
     }
     
-    // Check if user info is provided
-    const userInfo = getCurrentUserInfo();
-    if (!userInfo) {
-        showUserInfoModal();
-        return;
-    }
-    
-    // Proceed with spin
+    // User info should already be collected, proceed with spin
     executeSpinWheel();
 }
 
