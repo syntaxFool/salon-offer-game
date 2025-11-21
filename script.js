@@ -257,8 +257,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Save user info
             if (saveUserInfo(name, mobile)) {
                 closeUserInfoModal();
-                // Proceed with spin
-                executeSpinWheel();
+                // User must now click the spin button manually
             } else {
                 alert('Error saving your information. Please try again.');
             }
