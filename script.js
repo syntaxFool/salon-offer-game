@@ -285,6 +285,21 @@ document.addEventListener('DOMContentLoaded', () => {
         saveOfferButton.addEventListener('click', saveOffer);
     }
 
+    // Social sharing buttons
+    const shareWhatsAppBtn = document.getElementById('shareWhatsApp');
+    const shareFacebookBtn = document.getElementById('shareFacebook');
+    const shareTwitterBtn = document.getElementById('shareTwitter');
+    
+    if (shareWhatsAppBtn) {
+        shareWhatsAppBtn.addEventListener('click', shareOnWhatsApp);
+    }
+    if (shareFacebookBtn) {
+        shareFacebookBtn.addEventListener('click', shareOnFacebook);
+    }
+    if (shareTwitterBtn) {
+        shareTwitterBtn.addEventListener('click', shareOnTwitter);
+    }
+
     modal.addEventListener('click', (e) => {
         if (e.target === modal) {
             closeModal();
@@ -763,6 +778,35 @@ function logSpinToGoogleSheets(offer, code) {
     } catch (error) {
         console.warn('Error logging spin:', error);
     }
+}
+
+// ============================================
+// Social Media Sharing Functions
+// ============================================
+
+function shareOnWhatsApp() {
+    const offerText = offerResult.textContent;
+    const code = offerCode.textContent;
+    const message = `🎉 I just won an amazing offer at the salon!\n\n${offerText}\n\nCode: ${code}\n\nTry your luck at: https://salon-offer-spin.netlify.app`;
+    const encodedMessage = encodeURIComponent(message);
+    window.open(`https://api.whatsapp.com/send?text=${encodedMessage}`, '_blank');
+}
+
+function shareOnFacebook() {
+    const offerText = offerResult.textContent;
+    const code = offerCode.textContent;
+    const url = 'https://salon-offer-spin.netlify.app';
+    const quote = `I just won: ${offerText}! Code: ${code}. Try your luck at the salon wheel!`;
+    const encodedQuote = encodeURIComponent(quote);
+    window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}&quote=${encodedQuote}`, '_blank');
+}
+
+function shareOnTwitter() {
+    const offerText = offerResult.textContent;
+    const code = offerCode.textContent;
+    const text = `🎉 I just won ${offerText}! Code: ${code}\n\nTry your luck at the salon spin wheel: https://salon-offer-spin.netlify.app`;
+    const encodedText = encodeURIComponent(text);
+    window.open(`https://twitter.com/intent/tweet?text=${encodedText}`, '_blank');
 }
 
 // Close modal

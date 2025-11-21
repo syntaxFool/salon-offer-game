@@ -403,6 +403,92 @@ h1 {
     transform: translateY(-1px);
 }
 
+/* Social Sharing Styles */
+.social-sharing {
+    margin: 25px 0;
+    padding: 20px;
+    background: #f9f9f9;
+    border-radius: 10px;
+    border: 2px solid #d4af37;
+}
+
+.share-text {
+    color: #333;
+    font-size: 0.95em;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.social-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.social-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 10px 16px;
+    font-size: 0.95em;
+    font-weight: 600;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: white;
+}
+
+.social-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+}
+
+.social-btn:active {
+    transform: translateY(0);
+}
+
+.whatsapp-btn {
+    background: linear-gradient(135deg, #25d366 0%, #20ba5a 100%);
+    box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3);
+}
+
+.whatsapp-btn:hover {
+    background: linear-gradient(135deg, #20ba5a 0%, #25d366 100%);
+}
+
+.facebook-btn {
+    background: linear-gradient(135deg, #1877f2 0%, #0a66c2 100%);
+    box-shadow: 0 4px 12px rgba(24, 119, 242, 0.3);
+}
+
+.facebook-btn:hover {
+    background: linear-gradient(135deg, #0a66c2 0%, #1877f2 100%);
+}
+
+.twitter-btn {
+    background: linear-gradient(135deg, #000000 0%, #222222 100%);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.twitter-btn:hover {
+    background: linear-gradient(135deg, #222222 0%, #000000 100%);
+}
+
+@media (max-width: 600px) {
+    .social-buttons {
+        gap: 8px;
+    }
+    
+    .social-btn {
+        padding: 8px 12px;
+        font-size: 0.85em;
+    }
+}
+
 /* User Info Form Styles */
 .user-info-modal {
     max-width: 450px !important;
